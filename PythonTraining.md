@@ -242,6 +242,10 @@ Sparrows can fly.
 There are many types of birds.
 Ostriches cannot fly.
 ```
+Date : 22 July 2022
+-------------------
+-------------------
+
 #### Encapsulation
 Wrapping data and methods that work on data within one unit.This puts restrictions on accessing variables and methods directly and can prevent the accidental modification of data.
 
