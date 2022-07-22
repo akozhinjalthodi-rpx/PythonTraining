@@ -191,3 +191,273 @@ My name is Rahul
 IdNumber: 886012
 Post: Intern
 ```
+##### Types of Inheritance
+* Single Inheritance :- Derived class inherits charecteristics from single parent class.
+* Multilevel Inheritance :- child inherits properties from a parent class and the parent itself inherits properties from its parent class
+* Hierarichical Inheritance :- Multiple derived classes inherits properties from a parent class.
+* Multiple Inheritance :- One derived class inherits properties from more than one base(parent) class.
+  
+#### Polymorphism.
+Polymorphism simply means, behave according to the situation. For example we need to determine if the given species of bird, fly or not. We can do this using a single function.
+
+```python
+class Bird:
+
+	def intro(self):
+		print("There are many types of birds.")
+
+	def flight(self):
+		print("Most of the birds can fly but some cannot.")
+
+class sparrow(Bird):
+
+	def flight(self):
+		print("Sparrows can fly.")
+
+class ostrich(Bird):
+
+	def flight(self):
+		print("Ostriches cannot fly.")
+
+obj_bird = Bird()
+obj_spr = sparrow()
+obj_ost = ostrich()
+
+obj_bird.intro()
+obj_bird.flight()
+
+obj_spr.intro()
+obj_spr.flight()
+
+obj_ost.intro()
+obj_ost.flight()
+```
+##### Output
+
+```
+There are many types of birds.
+Most of the birds can fly but some cannot.
+There are many types of birds.
+Sparrows can fly.
+There are many types of birds.
+Ostriches cannot fly.
+```
+#### Encapsulation
+Wrapping data and methods that work on data within one unit.This puts restrictions on accessing variables and methods directly and can prevent the accidental modification of data.
+
+##### Protected Members
+* Members of class which cannot be accessed outside the class.
+* It can be accessed by members of the class or its subclass
+* Single _ is used to define a protected variable/member
+
+Note : Although the protected variable can be accessed out of the class as well as in the derived class(modified too in derived class), it is customary(convention not a rule) to not access the protected out the class body.
+
+```python
+# Python program to
+# demonstrate protected members
+
+# Creating a base class
+class Base:
+	def __init__(self):
+
+		# Protected member
+		self._a = 2
+
+# Creating a derived class
+class Derived(Base):
+	def __init__(self):
+
+		# Calling constructor of
+		# Base class
+		Base.__init__(self)
+		print("Calling protected member of base class: ",
+			self._a)
+
+		# Modify the protected variable:
+		self._a = 3
+		print("Calling modified protected member outside class: ",
+			self._a)
+
+
+obj1 = Derived()
+
+obj2 = Base()
+
+# Calling protected member
+# Can be accessed but should not be done due to convention
+print("Accessing protected member of obj1: ", obj1._a)
+
+# Accessing the protected variable outside
+print("Accessing protected member of obj2: ", obj2._a)
+
+```
+Output
+```
+Calling protected member of base class:  2
+Calling modified protected member outside class:  3
+Accessing protected member of obj1:  3
+Accessing protected member of obj2:  2
+```
+##### Private Members
+* Cannot be accessed outside the class/ or from its base class
+* __ is used to define a private variable/member
+* Note: Python’s private and protected members can be accessed outside the class through python name mangling. 
+
+```python
+# Python program to
+# demonstrate private members
+
+# Creating a Base class
+
+
+class Base:
+	def __init__(self):
+		self.a = "GeeksforGeeks"
+		self.__c = "GeeksforGeeks"
+
+# Creating a derived class
+class Derived(Base):
+	def __init__(self):
+
+		# Calling constructor of
+		# Base class
+		Base.__init__(self)
+		print("Calling private member of base class: ")
+		print(self.__c)
+
+
+# Driver code
+obj1 = Base()
+print(obj1.a)
+
+# Uncommenting print(obj1.c) will
+# raise an AttributeError
+
+# Uncommenting obj2 = Derived() will
+# also raise an AtrributeError as
+# private member of base class
+# is called inside derived class
+```
+
+Output
+```
+GeeksforGeeks
+```
+
+```
+Traceback (most recent call last):
+  File "/home/f4905b43bfcf29567e360c709d3c52bd.py", line 25, in <module>
+    print(obj1.c)
+AttributeError: 'Base' object has no attribute 'c'
+
+Traceback (most recent call last):
+  File "/home/4d97a4efe3ea68e55f48f1e7c7ed39cf.py", line 27, in <module>
+    obj2 = Derived()
+  File "/home/4d97a4efe3ea68e55f48f1e7c7ed39cf.py", line 20, in __init__
+    print(self.__c)
+AttributeError: 'Derived' object has no attribute '_Derived__c' 
+
+```
+#### Data Abstraction
+* Hides unnecessary code details from the user.
+* Data abstraction can be achieved by using a abstract class.
+##### Data Hiding
+* In Python, we use double underscore (Or __) before the attributes name and those attributes will not be directly visible outside. 
+```python
+class MyClass:
+
+	# Hidden member of MyClass
+	__hiddenVariable = 0
+	
+	# A member method that changes
+	# __hiddenVariable
+	def add(self, increment):
+		self.__hiddenVariable += increment
+		print (self.__hiddenVariable)
+
+# Driver code
+myObject = MyClass()	
+myObject.add(2)
+myObject.add(5)
+
+# This line causes error
+print (myObject.__hiddenVariable)
+```
+Output
+```
+2
+7
+Traceback (most recent call last):
+  File "filename.py", line 13, in 
+    print (myObject.__hiddenVariable)
+AttributeError: MyClass instance has 
+no attribute '__hiddenVariable'
+```
+In the above program, we tried to access a hidden variable outside the class using an object and it threw an exception.
+
+We can access the value of a hidden attribute by a tricky syntax: 
+```python
+# A Python program to demonstrate that hidden
+# members can be accessed outside a class
+class MyClass:
+
+	# Hidden member of MyClass
+	__hiddenVariable = 10
+
+# Driver code
+myObject = MyClass()	
+print(myObject._MyClass__hiddenVariable)
+```
+
+Output
+```
+10
+```
+##### Printing Objects
+Printing objects give us information about objects we are working with.
+In python __repr__ or __str__ method is used to display information about the object.
+We can define these methods inside the class and add contents about the object.
+
+```python
+class Test:
+	def __init__(self, a, b):
+		self.a = a
+		self.b = b
+
+	def __repr__(self):
+		return "Test a:%s b:%s" % (self.a, self.b)
+
+	def __str__(self):
+		return "From str method of Test: a is %s," \
+			"b is %s" % (self.a, self.b)
+
+# Driver Code		
+t = Test(1234, 5678)
+print(t) # This calls __str__()
+print([t]) # This calls __repr__()
+```
+Output
+```
+From str method of Test: a is 1234,b is 5678
+[Test a:1234 b:5678]
+```
+Note: If no __str__ method is defined, it will use __repr__ method. If no __repr__ method is defined, then default is used(print object)
+
+```python
+class Test:
+	def __init__(self, a, b):
+		self.a = a
+		self.b = b
+
+# Driver Code		
+t = Test(1234, 5678)
+print(t)
+
+```
+Output
+```
+<__main__.Test instance at 0x7fa079da6710> 
+
+```
+
+
