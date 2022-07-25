@@ -464,4 +464,120 @@ Output
 
 ```
 
+Date : 25th July 2022
 
+------------------------
+## REPL
+* REPL stands for READ EVALUATE PRINT LOOP
+* It is an interactive Micro Python Prompt
+* Features
+  * Input history: use arrow up and arrow down to scroll through the history
+  * Tab completion: press tab to auto-complete variables or module names
+  * Halt any executing code: with Ctrl-C
+  * Copy/paste code or output: Ctrl-C and Ctrl-V
+
+## PyCharm 
+PyCharm is a dedicated Python Integrated Development Environment (IDE) providing a wide range of essential tools for Python developers, tightly integrated to create a convenient environment for productive Python, web, and data science development.
+
+Download Link : https://www.jetbrains.com/pycharm/download/#section=windows
+
+## Python Operators
+
+### Overview :
+Python divides the operators in the following groups:
+* Arithmetic operators
+* Assignment operators
+* Comparison operators
+* Logical operators
+* Identity operators
+* Membership operators
+* Bitwise operators
+
+### Arithmetic Operators
+
+Arithmetic operators are used with numeric values to perform common mathematical operations:
+
+`+` Addition, Eg : `x + y`
+
+`-` Substraction, Eg: `x - y`
+
+`*` Multiplication, Eg : `x * y`
+
+`/` Division, Eg : `x / y` 
+
+`%` Modulus, Eg : `x % y`
+
+`**` Exponentiation, Eg : `x ** y`
+
+`//` Floor Division, Eg : ` x // y`
+
+### Assignment Operators 
+
+
+Assignment Operators are used to assign values to variables
+
+Operator|Example|Same As
+--------|-------|-------
+=	|x = 5	|x = 5	
++=	|x += 3	|x = x + 3	
+-=	|x -= 3	|x = x - 3	
+*=	|x *= 3	|x = x * 3	
+/=	|x /= 3	|x = x / 3	
+%=	|x %= 3	|x = x % 3	
+//=	|x //= 3|x = x // 3	
+**=	|x **= 3|x = x ** 3	
+&=	|x &= 3	|x = x & 3	
+|=	|x |= 3	|x = x | 3	
+^=	|x ^= 3	|x = x ^ 3	
+\>>=	|x >>= 3	|x = x >> 3	
+<<=	|x <<= 3	|x = x << 3
+
+### Comparison Operators
+Comparison operators are used to compare two values:
+
+Operator|Name|Example
+--------|-------|-----
+== | Equal |x==y
+!= | Not Equal | x!=y
+\> | Greater than | x > y
+< | Less than | x < y
+\>= | Greater than or equal to | x >=y
+<= | Less than or equal to | x <= y
+
+### Python Logical Operators
+
+Logical operators are used to combine conditional statements:
+
+| Operator | Description | Example|
+|----------|-------------|--------|
+| and | Returns true if both statements are true | `x < 5 and x < 10`|
+| or | Returns true if any one of the satements are true| `x = 5 or x < 10`|  
+| not | Reverse the result, Return false if the result is true | `not (x < 5 and x < 10)`|
+
+### Identity Operators
+
+Identity operators are used to compare the objects, not if they are equal, but if they are actually the same object, with the same memory location
+
+| Operator | Description | Example|
+|----------|-------------|---------|
+| is | Returns true if both variables are same object | `x is y`|
+| is not | Returns true if both variables are different object | ` x is not y`|
+
+### Membership Operators
+| Operator | Description | Example|
+|----------|-------------|---------|
+| in | returns true, if a sequence with a specific value present in the object| x in y|
+| not in | returns true, if if a sequence with a specific value not present in the object|
+
+### Bitwise Operators
+
+Bitwise operators are used to compare Binary Numbers:
+
+Operator|Name|Description
+--------|-------|-----|
+& | AND |	Sets each bit to 1 if both bits are 1
+| \| | OR |Sets each bit to 1 if one of two bits is 1
+| ^	| XOR |Sets each bit to 1 if only one of two bits is 1
+| ~ 	|NOT| Inverts all the bits
+| << | Zero fill left shift	| Shift left by pushing zeros in from the right and let the leftmost bits fall off
+|\>> | Signed right shift | Shift right by pushing copies of the leftmost bit in from the left, and let the rightmost bits fall off
