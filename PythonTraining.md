@@ -581,3 +581,493 @@ Operator|Name|Description
 | ~ 	|NOT| Inverts all the bits
 | << | Zero fill left shift	| Shift left by pushing zeros in from the right and let the leftmost bits fall off
 |\>> | Signed right shift | Shift right by pushing copies of the leftmost bit in from the left, and let the rightmost bits fall off
+
+Date : 26 July 2022
+
+--------------------
+
+## Variables 
+
+* Variables are containers for storing data values.
+* A variable is created the moment you first assign a value to it.
+* A Python Variables is only a name given to a memory location, all the operations done on the variable effects that memory location.
+
+### Rules for creating a variable
+* A variable name must start with a letter or underscore character 
+* A variable name cannot start with number
+* A variable name can only contain alpha-numeric characters and underscores
+* Variable names are Case Sensitive(name, Name and NAME are three different variables)
+* Reserved keywords cannot be used to name a variable 
+
+
+Example 
+```python
+x = 5
+y = "John"
+print(x)
+print(y)
+```
+Output
+```
+5
+John
+```
+
+### Assigning single value to multiple variables 
+
+Python allows assigning a single value to several variables, Simultaniously with "=" operator
+
+```python
+a = b = c = 10
+
+print(a)
+print(b)
+print(c)
+
+```
+Output:
+```
+10
+10
+10
+```
+### Assigning Different values to multiple variables
+Python allows adding different values in a single line with “,”operators.
+
+```python
+a, b, c = 1, 20.2, "GeeksforGeeks"
+
+print(a)
+print(b)
+print(c)
+```
+Output:
+```
+1
+20.2
+GeeksforGeeks
+```
+### Casting
+If you want to specify the data type of a variable, this can be done with casting.
+```python
+x = str(3)    # x will be '3'
+y = int(3)    # y will be 3
+z = float(3)  # z will be 3.0
+```
+### Get the type
+You can get the data type of a variable with the type() function.
+```python
+x = 5
+y = "John"
+print(type(x))
+print(type(y))
+```
+Output
+```
+<class 'int'>
+<class 'str'>
+```
+### Single or Double Quote?
+String Variable can be defined by using either single quote or double quote
+
+```python
+x = "John"
+# is the same as
+x = 'John
+```
+
+### Global and Local Python Variables
+
+* Local Variables are the ones that are defined and declared inside the function, We cannot call this variable outside the function.
+
+```python
+# This function uses global variable s
+def f():
+	s = "Welcome geeks"
+	print(s)
+f()
+```
+* Global Variables are the ones that are defined and declared outside a function
+  
+```python
+# This function has a variable with
+# name same as s.
+def f():
+	print(s)
+
+
+# Global scope
+s = "I love Geeksforgeeks"
+f()
+```
+Output
+```
+I love Geeksforgeeks
+```
+
+### Global Keyword in python
+
+Global keyword is a keyword that allows a user to modify a variable outside of the current scope. It is used to create global variables from a non-global scope i.e inside a function. Global keyword is used inside a function only when we want to do assignments or when we want to change a variable. Global is not needed for printing and accessing.
+
+#### Rules of Global Keyword
+* If a variable is assigned a value anywhere within the function’s body, it’s assumed to be a local unless explicitly declared as global.
+* Variables that are only referenced inside a function are implicitly global.
+* We Use global keyword to use a global variable inside a function.
+* There is no need to use global keyword outside a function.
+
+```python
+# Python program to modify a global
+# value inside a function
+
+x = 15
+def change():
+
+	# using a global keyword
+	global x
+
+	# increment value of a by 5
+	x = x + 5
+	print("Value of x inside a function :", x)
+
+
+change()
+print("Value of x outside a function :", x)
+
+```
+Output:
+```
+Value of x inside a function : 20
+Value of x outside a function : 20
+```
+
+### Variable type in Python
+Data types are the classification or categorization of data items. It represents the kind of value that tells what operations can be performed on a particular data. Since everything is an object in Python programming, data types are actually classes and variables are instance (object) of these classes.
+
+Following are the standard or built-in data type of Python:
+
+* Numeric
+* Sequence Type
+* Boolean
+* Set
+* Dictionary
+
+```python
+# numberic
+var = 123
+print("Numbric data : ", var)
+
+# Sequence Type
+String1 = 'Welcome to the Geeks World'
+print("String with the use of Single Quotes: ")
+print(String1)
+
+# Boolean
+print(type(True))
+print(type(False))
+
+# Creating a Set with
+# the use of a String
+set1 = set("GeeksForGeeks")
+print("\nSet with the use of String: ")
+print(set1)
+
+# Creating a Dictionary
+# with Integer Keys
+Dict = {1: 'Geeks', 2: 'For', 3: 'Geeks'}
+print("\nDictionary with the use of Integer Keys: ")
+print(Dict)
+
+```
+
+Output
+```
+Numbric data :  123
+String with the use of Single Quotes: 
+Welcome to the Geeks World
+<class 'bool'>
+<class 'bool'>
+
+Set with the use of String: 
+{'r', 'G', 'e', 'k', 'o', 's', 'F'}
+
+Dictionary with the use of Integer Keys: 
+{1: 'Geeks', 2: 'For', 3: 'Geeks'}
+```
+### Object References
+
+```
+x = 5
+x=y
+```
+When Python looks at the first statement, what it does is that, first, it creates an object to represent the value 5. Then, it creates the variable x if it doesn’t exist and made it a reference to this new object 5. The second line causes Python to create the variable y, and it is not assigned with x, rather it is made to reference that object that x does. The net effect is that the variables x and y wind up referencing the same object. This situation, with multiple names referencing the same object, is called a *_Shared Reference_* in Python.
+
+### Creating objects (or variables of a class type)
+
+```python
+# Python program to show that the variables with a value
+# assigned in class declaration, are class variables and
+# variables inside methods and constructors are instance
+# variables.
+
+# Class for Computer Science Student
+class CSStudent:
+
+	# Class Variable
+	stream = 'cse'		
+
+	# The init method or constructor
+	def __init__(self, roll):
+	
+		# Instance Variable
+		self.roll = roll	
+
+# Objects of CSStudent class
+a = CSStudent(101)
+b = CSStudent(102)
+
+print(a.stream) # prints "cse"
+print(b.stream) # prints "cse"
+print(a.roll) # prints 101
+
+# Class variables can be accessed using class
+# name also
+print(CSStudent.stream) # prints "cse"
+
+```
+Output:
+```
+cse
+cse
+101
+cse
+```
+
+## Types of inheritance Python
+Inheritance is defined as the mechanism of inheriting the properties of the base class to the child class.
+
+### Types of Inheritaince
+* Single Inheritance
+* Multiple Inheritance
+* Multilevel Inheritance
+* Hierarchical Inheritance
+* Hybrid Inheritance
+
+#### Single Inheritaince
+Single inheritance enables a derived class to inherit properties from a single parent class, thus enabling code reusability and the addition of new features to existing code.
+
+```python
+#Python program to demonstrate single inhertaince 
+
+# Base Class
+class Parent:
+	def func1(self):
+		print("This function is in Parent class")
+	
+# Derived Class 
+
+class Child(Parent):
+	def func2(self):
+		print("This function is in child class")
+
+# Driver's code
+object=Child()
+object.func1()
+object.func2()
+```
+
+Output:
+
+```
+This function is in parent class.
+This function is in child class.
+```
+
+#### Multiple Inheritaince
+When a class can be derived from more than one base class this type of inheritance is called multiple inheritances. In multiple inheritances, all the features of the base classes are inherited into the derived class
+
+```python
+# Python program to demonstrate
+# multiple inheritance
+
+# Base class1
+class Mother:
+	mothername = ""
+
+	def mother(self):
+		print(self.mothername)
+
+# Base class2
+
+
+class Father:
+	fathername = ""
+
+	def father(self):
+		print(self.fathername)
+
+# Derived class
+
+
+class Son(Mother, Father):
+	def parents(self):
+		print("Father :", self.fathername)
+		print("Mother :", self.mothername)
+
+
+# Driver's code
+s1 = Son()
+s1.fathername = "RAM"
+s1.mothername = "SITA"
+s1.parents()
+
+```
+
+Output:
+```
+Father : RAM
+Mother : SITA
+```
+
+#### Multilevel Inheritance :
+In multilevel inheritance, features of the base class and the derived class are further inherited into the new derived class. This is similar to a relationship representing a child and a grandfather. 
+
+```python
+# Python program to demonstrate
+# multilevel inheritance
+
+# Base class
+
+
+class Grandfather:
+
+	def __init__(self, grandfathername):
+		self.grandfathername = grandfathername
+
+# Intermediate class
+
+
+class Father(Grandfather):
+	def __init__(self, fathername, grandfathername):
+		self.fathername = fathername
+
+		# invoking constructor of Grandfather class
+		Grandfather.__init__(self, grandfathername)
+
+# Derived class
+
+
+class Son(Father):
+	def __init__(self, sonname, fathername, grandfathername):
+		self.sonname = sonname
+
+		# invoking constructor of Father class
+		Father.__init__(self, fathername, grandfathername)
+
+	def print_name(self):
+		print('Grandfather name :', self.grandfathername)
+		print("Father name :", self.fathername)
+		print("Son name :", self.sonname)
+
+
+# Driver code
+s1 = Son('Prince', 'Rampal', 'Lal mani')
+print(s1.grandfathername)
+s1.print_name()
+
+```
+
+Output:
+```
+Lal mani
+Grandfather name : Lal mani
+Father name : Rampal
+Son name : Prince
+```
+
+#### Hierarichical Inheritaince
+
+When more than one derived class are created from a single base this type of inheritance is called hierarchical inheritance. In this program, we have a parent (base) class and two child (derived) classes.
+
+```python3
+# Python program to demonstrate
+# Hierarchical inheritance
+
+
+# Base class
+class Parent:
+	def func1(self):
+		print("This function is in parent class.")
+
+# Derived class1
+
+
+class Child1(Parent):
+	def func2(self):
+		print("This function is in child 1.")
+
+# Derivied class2
+
+
+class Child2(Parent):
+	def func3(self):
+		print("This function is in child 2.")
+
+
+# Driver's code
+object1 = Child1()
+object2 = Child2()
+object1.func1()
+object1.func2()
+object2.func1()
+object2.func3()
+```
+
+Output:
+
+```
+This function is in parent class.
+This function is in child 1.
+This function is in parent class.
+This function is in child 2.
+```
+
+#### Hybrid Inheritance: 
+Inheritance consisting of multiple types of inheritance is called hybrid inheritance.
+
+```python
+# Python program to demonstrate
+# hybrid inheritance
+
+
+class School:
+	def func1(self):
+		print("This function is in school.")
+
+
+class Student1(School):
+	def func2(self):
+		print("This function is in student 1. ")
+
+
+class Student2(School):
+	def func3(self):
+		print("This function is in student 2.")
+
+
+class Student3(Student1, School):
+	def func4(self):
+		print("This function is in student 3.")
+
+
+# Driver's code
+object = Student3()
+object.func1()
+object.func2()
+
+```
+
+Output:
+```
+This function is in school.
+This function is in student 1.
+```
