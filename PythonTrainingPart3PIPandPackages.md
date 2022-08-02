@@ -118,7 +118,7 @@ A Python module may contain several classes, functions, variables, etc. whereas 
 Let’s create a package named mypckg that will contain two modules mod1 and mod2. To create this module follow the below steps – 
 
 * Create a folder named mypckg.
-* Inside this folder create an empty Python file i.e. __init__.py
+* Inside this folder create an empty Python file i.e. \_\_init\_\_.py
 * Then create two modules mod1 and mod2 in this folder.
 Mod1.py
 
@@ -149,11 +149,11 @@ mypckg
 
 ```
 
-### Understanding __init__.py
+### Understanding \_\_init\_\_.py
 
-__init__.py helps the Python interpreter to recognise the folder as package. It also specifies the resources to be imported from the modules. If the __init__.py is empty this means that all the functions of the modules will be imported. We can also specify the functions from each module to be made available.
+\_\_init\_\_.py helps the Python interpreter to recognise the folder as package. It also specifies the resources to be imported from the modules. If the \_\_init\_\_.py is empty this means that all the functions of the modules will be imported. We can also specify the functions from each module to be made available.
 
-For example, we can also create the __init__.py file for the above module as – 
+For example, we can also create the \_\_init\_\_.py file for the above module as – 
 
 \_\_init\_\_.py
 ```python
@@ -161,7 +161,7 @@ from .mod1 import gfg
 from .mod2 import sum
 ```
 
-This __init__.py will only allow the gfg and sum functions from the mod1 and mod2 modules to be imported.
+This \_\_init\_\_.py will only allow the gfg and sum functions from the mod1 and mod2 modules to be imported.
 
 ### Import Modules from a Package
 Syntax:
