@@ -448,3 +448,103 @@ Output:
 Enter a value: 50
 The sum is 55
 ```
+
+## Python Type Casting
+Type Casting is the method to convert the variable data type into a certain data type in order to the operation required to be performed by users. In this article, we will see the various technique for typecasting.
+
+There can be two types of Type Casting in Python –
+
+* Implicit Type Casting
+* Explicit Type Casting
+
+### Implicit Type Conversion
+In this,  methods, Python converts data type into another data type automatically. In this process, users don’t have to involve in this process. 
+
+```python
+# Python program to demonstrate
+# implicit type Casting
+
+# Python automatically converts
+# a to int
+a = 7
+print(type(a))
+
+# Python automatically converts
+# b to float
+b = 3.0
+print(type(b))
+
+# Python automatically converts
+# c to float as it is a float addition
+c = a + b
+print(c)
+print(type(c))
+
+# Python automatically converts
+# d to float as it is a float multiplication
+d = a * b
+print(d)
+print(type(d))
+```
+
+Output:
+```
+<class 'int'>
+<class 'float'>
+10.0
+<class 'float'>
+21.0
+<class 'float'>
+```
+### Explicit Type Casting
+In this method, Python need user involvement to convert the variable data type into certain data type in order to the operation required.
+
+Mainly in type casting can be done with these data type function:
+* `Int()` : Int() function take float or string as an argument and return int type object.
+* `float()` : float() function take int or string as an argument and return float type object.
+* `str()` : str() function take float or int as an argument and return string type object.
+
+#### Let’s see some example of type casting:
+Type Casting int to float:
+
+Here, we are casting integer object to float object with float() function.
+
+```python
+# Python program to demonstrate
+# type Casting
+
+# int variable
+a = 5
+
+# typecast to float
+n = float(a)
+
+print(n)
+print(type(n))
+
+```
+Output:
+```
+5.0
+<class 'float'>
+```
+#### Type Casting float to int:
+
+```python
+# Python program to demonstrate
+# type Casting
+
+# int variable
+a = 5.9
+
+# typecast to int
+n = int(a)
+
+print(n)
+print(type(n))
+```
+Output:
+```
+5
+<class 'int'>
+```
