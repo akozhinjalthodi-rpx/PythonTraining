@@ -1128,3 +1128,212 @@ In previous parts of the tutorial, the templates have been provided with a conte
 
 Run the server, and use your new polling app based on generic views.
 
+Date: 22 Aug 2022
+
+----------------
+## Testing the code : Introducing automated testing
+
+Tests are routines that check the operation of your code.
+
+### Why you need to create tests
+You may feel that you have quite enough on your plate just learning Python/Django, and having yet another thing to learn and do may seem overwhelming and perhaps unnecessary. After all, our polls application is working quite happily now; going through the trouble of creating automated tests is not going to make it work any better. If creating the polls application is the last bit of Django programming you will ever do, then true, you don’t need to know how to create automated tests. But, if that’s not the case, now is an excellent time to learn.
+
+#### Tests will save you time
+Up to a certain point, ‘checking that it seems to work’ will be a satisfactory test. In a more sophisticated application, you might have dozens of complex interactions between components.
+
+A change in any of those components could have unexpected consequences on the application’s behavior. Checking that it still ‘seems to work’ could mean running through your code’s functionality with twenty different variations of your test data to make sure you haven’t broken something - not a good use of your time.
+
+That’s especially true when automated tests could do this for you in seconds. If something’s gone wrong, tests will also assist in identifying the code that’s causing the unexpected behavior.
+
+Sometimes it may seem a chore to tear yourself away from your productive, creative programming work to face the unglamorous and unexciting business of writing tests, particularly when you know your code is working properly.
+
+However, the task of writing tests is a lot more fulfilling than spending hours testing your application manually or trying to identify the cause of a newly-introduced problem.
+
+#### Tests don’t just identify problems, they prevent them
+It’s a mistake to think of tests merely as a negative aspect of development.
+
+Without tests, the purpose or intended behavior of an application might be rather opaque. Even when it’s your own code, you will sometimes find yourself poking around in it trying to find out what exactly it’s doing.
+
+Tests change that; they light up your code from the inside, and when something goes wrong, they focus light on the part that has gone wrong - even if you hadn’t even realized it had gone wrong.
+
+#### Tests make your code more attractive
+You might have created a brilliant piece of software, but you will find that many other developers will refuse to look at it because it lacks tests; without tests, they won’t trust it. Jacob Kaplan-Moss, one of Django’s original developers, says *“Code without tests is broken by design.”*
+
+#### Tests help teams work together
+The previous points are written from the point of view of a single developer maintaining an application. Complex applications will be maintained by teams. Tests guarantee that colleagues don’t inadvertently break your code (and that you don’t break theirs without knowing). If you want to make a living as a Django programmer, you must be good at writing tests!
+
+#### Basic testing strategies
+Some programmers follow a discipline called “test-driven development”; they actually write their tests before they write their code. This might seem counter-intuitive, but in fact it’s similar to what most people will often do anyway: they describe a problem, then create some code to solve it. Test-driven development formalizes the problem in a Python test case.
+
+
+More often, a newcomer to testing will create some code and later decide that it should have some tests. Perhaps it would have been better to write some tests earlier, but it’s never too late to get started.
+
+Sometimes it’s difficult to figure out where to get started with writing tests. If you have written several thousand lines of Python, choosing something to test might not be easy. In such a case, it’s fruitful to write your first test the next time you make a change, either when you add a new feature or fix a bug.
+
+### Writing our first test
+
+#### We identify a bug
+
+Fortunately, there’s a little bug in the polls application for us to fix right away: the Question.was_published_recently() method returns True if the Question was published within the last day (which is correct) but also if the Question’s pub_date field is in the future (which certainly isn’t).
+
+Confirm the bug by using the shell to check the method on a question whose date lies in the future:
+
+```bash
+>>> import datetime
+>>> from django.utils import timezone
+>>> from polls.models import Question
+>>> # create a Question instance with pub_date 30 days in the future
+>>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
+>>> # was it published recently?
+>>> future_question.was_published_recently()
+True
+```
+Since things in the future are not ‘recent’, this is clearly wrong.
+
+
+#### Create a test to expose the bug
+
+A conventional place for an application’s tests is in the application’s tests.py file; the *testing system will automatically find tests in any file whose name begins with test*.
+
+Put the following in the tests.py file in the polls application:
+
+```python
+import datetime
+
+from django.test import TestCase
+from django.utils import timezone
+
+from .models import Question
+
+
+class QuestionModelTests(TestCase):
+
+    def test_was_published_recently_with_future_question(self):
+        """
+        was_published_recently() returns False for questions whose pub_date
+        is in the future.
+        """
+        time = timezone.now() + datetime.timedelta(days=30)
+        future_question = Question(pub_date=time)
+        self.assertIs(future_question.was_published_recently(), False)
+```
+
+Here we have created a django.test.TestCase subclass with a method that creates a Question instance with a pub_date in the future. We then check the output of was_published_recently() - which ought to be False.
+
+
+#### Running tests
+
+In the terminal, we can run our test:
+
+```
+py manage.py test polls
+```
+Output:
+```
+Found 1 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+F
+======================================================================
+FAIL: test_was_published_recently_with_future_question (polls2.tests.QuestionModelTests)
+was_published_recently() returns False for future Questions, Whose pub_date is in the future.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/aneesh/git/gitr/PythonTraining/mypollingwebapp/polls2/tests.py", line 17, in test_was_published_recently_with_future_question
+    self.assertIs(future_question.was_published_recently(),False)
+AssertionError: True is not False
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)
+Destroying test database for alias 'default'..
+```
+
+```
+Different error?
+
+If instead you’re getting a NameError here, you may have missed a step in Part 2 where we added imports of datetime and timezone to polls/models.py. Copy the imports from that section, and try running your tests again.
+```
+What happened is this:
+
+* manage.py test polls looked for tests in the polls application
+* it found a subclass of the django.test.TestCase class
+* it created a special database for the purpose of testing
+* it looked for test methods - ones whose names begin with test
+* in test_was_published_recently_with_future_question it created a Question instance whose pub_date field is 30 days in the future
+* … and using the assertIs() method, it discovered that its was_published_recently() returns True, though we wanted it to return False
+
+The test informs us which test failed and even the line on which the failure occurred.
+
+
+#### Fixing the bug
+We already know what the problem is: Question.was_published_recently() should return False if its pub_date is in the future. Amend the method in models.py, so that it will only return True if the date is also in the past:
+
+```python
+def was_published_recently(self):
+    now = timezone.now()
+    return now - datetime.timedelta(days=1) <= self.pub_date <= now
+```
+and run the test again:
+
+```
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+Destroying test database for alias 'default'...
+```
+After identifying a bug, we wrote a test that exposes it and corrected the bug in the code so our test passes.
+
+Many other things might go wrong with our application in the future, but we can be sure that we won’t inadvertently reintroduce this bug, because running the test will warn us immediately. We can consider this little portion of the application pinned down safely forever.
+
+### More comprehensive tests
+While we’re here, we can further pin down the was_published_recently() method; in fact, it would be positively embarrassing if in fixing one bug we had introduced another.
+
+Add two more test methods to the same class, to test the behavior of the method more comprehensively:
+
+```python
+def test_was_published_recently_with_old_question(self):
+    """
+    was_published_recently() returns False for questions whose pub_date
+    is older than 1 day.
+    """
+    time = timezone.now() - datetime.timedelta(days=1, seconds=1)
+    old_question = Question(pub_date=time)
+    self.assertIs(old_question.was_published_recently(), False)
+
+def test_was_published_recently_with_recent_question(self):
+    """
+    was_published_recently() returns True for questions whose pub_date
+    is within the last day.
+    """
+    time = timezone.now() - datetime.timedelta(hours=23, minutes=59, seconds=59)
+    recent_question = Question(pub_date=time)
+    self.assertIs(recent_question.was_published_recently(), True)
+```
+And now we have three tests that confirm that Question.was_published_recently() returns sensible values for past, recent, and future questions.
+
+Again, polls is a minimal application, but however complex it grows in the future and whatever other code it interacts with, we now have some guarantee that the method we have written tests for will behave in expected ways.
+
+
+
+### Test a view
+The polls application is fairly undiscriminating: it will publish any question, including ones whose pub_date field lies in the future. We should improve this. Setting a pub_date in the future should mean that the Question is published at that moment, but invisible until then.
+
+#### A test for a view
+When we fixed the bug above, we wrote the test first and then the code to fix it. In fact that was an example of test-driven development, but it doesn’t really matter in which order we do the work.
+
+In our first test, we focused closely on the internal behavior of the code. For this test, we want to check its behavior as it would be experienced by a user through a web browser.
+
+#### The Django test client
+Django provides a test Client to simulate a user interacting with the code at the view level. We can use it in tests.py or even in the shell.
+
+We will start again with the shell, where we need to do a couple of things that won’t be necessary in tests.py. The first is to set up the test environment in the shell:
+
+
+
+
