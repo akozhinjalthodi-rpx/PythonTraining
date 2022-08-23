@@ -1329,11 +1329,312 @@ When we fixed the bug above, we wrote the test first and then the code to fix it
 
 In our first test, we focused closely on the internal behavior of the code. For this test, we want to check its behavior as it would be experienced by a user through a web browser.
 
+
+Date : 23 Aug 2022 
+
+------------------
 #### The Django test client
 Django provides a test Client to simulate a user interacting with the code at the view level. We can use it in tests.py or even in the shell.
 
 We will start again with the shell, where we need to do a couple of things that won’t be necessary in tests.py. The first is to set up the test environment in the shell:
 
+```
+$ python manage.py shell
+```
+```python
+>>> from django.test.utils import setup_test_environment
+>>> setup_test_environment()
+```
+
+setup_test_environment() installs a template renderer which will allow us to examine some additional attributes on responses such as response.context that otherwise wouldn’t be available. Note that this method does not set up a test database, so the following will be run against the existing database and the output may differ slightly depending on what questions you already created. You might get unexpected results if your TIME_ZONE in settings.py isn’t correct. If you don’t remember setting it earlier, check it before continuing.
+
+Next we need to import the test client class (later in tests.py we will use the django.test.TestCase class, which comes with its own client, so this won’t be required):
+
+
+```python
+>>> from django.test import Client
+>>> # create an instance of the client for our use
+>>> client = Client()
+```
+
+With that ready, we can ask the client to do some work for us:
 
 
 
+```python
+>>> # get a response from '/'
+>>> response = client.get('/')
+Not Found: /
+>>> # we should expect a 404 from that address; if you instead see an
+>>> # "Invalid HTTP_HOST header" error and a 400 response, you probably
+>>> # omitted the setup_test_environment() call described earlier.
+>>> response.status_code
+404
+>>> # on the other hand we should expect to find something at '/polls/'
+>>> # we'll use 'reverse()' rather than a hardcoded URL
+>>> from django.urls import reverse
+>>> response = client.get(reverse('polls:index'))
+>>> response.status_code
+200
+>>> response.content
+b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#x27;s up?</a></li>\n    \n    </ul>\n\n'
+>>> response.context['latest_question_list']
+<QuerySet [<Question: What's up?>]>
+```
+
+### Improving our view
+
+The list of polls shows polls that aren’t published yet (i.e. those that have a pub_date in the future). Let’s fix that.
+
+We need to amend the get_queryset() method and change it so that it also checks the date by comparing it with timezone.now(). First we need to add an import:
+
+```python
+#views.py
+def get_queryset(self):
+    """
+    Return the last five published questions (not including those set to be
+    published in the future).
+    """
+    return Question.objects.filter(
+        pub_date__lte=timezone.now()
+    ).order_by('-pub_date')[:5]
+```
+
+== Question.objects.filter(pub_date__lte=timezone.now()) == returns a queryset containing Questions whose pub_date is less than or equal to - that is, earlier than or equal to - timezone.now.
+
+### Testing our new view
+Now you can satisfy yourself that this behaves as expected by firing up runserver, loading the site in your browser, creating Questions with dates in the past and future, and checking that only those that have been published are listed. You don’t want to have to do that every single time you make any change that might affect this - so let’s also create a test, based on our shell session above.
+
+Add the following to polls/tests.py:
+
+
+```
+from django.urls import reverse
+```
+
+and we’ll create a shortcut function to create questions as well as a new test class:
+
+```python
+
+def create_question(question_text, days):
+    """
+    Create a question with the given `question_text` and published the
+    given number of `days` offset to now (negative for questions published
+    in the past, positive for questions that have yet to be published).
+    """
+    time = timezone.now() + datetime.timedelta(days=days)
+    return Question.objects.create(question_text=question_text, pub_date=time)
+
+
+class QuestionIndexViewTests(TestCase):
+    def test_no_questions(self):
+        """
+        If no questions exist, an appropriate message is displayed.
+        """
+        response = self.client.get(reverse('polls:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No polls are available.")
+        self.assertQuerysetEqual(response.context['latest_question_list'], [])
+
+    def test_past_question(self):
+        """
+        Questions with a pub_date in the past are displayed on the
+        index page.
+        """
+        question = create_question(question_text="Past question.", days=-30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(
+            response.context['latest_question_list'],
+            [question],
+        )
+
+    def test_future_question(self):
+        """
+        Questions with a pub_date in the future aren't displayed on
+        the index page.
+        """
+        create_question(question_text="Future question.", days=30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertContains(response, "No polls are available.")
+        self.assertQuerysetEqual(response.context['latest_question_list'], [])
+
+    def test_future_question_and_past_question(self):
+        """
+        Even if both past and future questions exist, only past questions
+        are displayed.
+        """
+        question = create_question(question_text="Past question.", days=-30)
+        create_question(question_text="Future question.", days=30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(
+            response.context['latest_question_list'],
+            [question],
+        )
+
+    def test_two_past_questions(self):
+        """
+        The questions index page may display multiple questions.
+        """
+        question1 = create_question(question_text="Past question 1.", days=-30)
+        question2 = create_question(question_text="Past question 2.", days=-5)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(
+            response.context['latest_question_list'],
+            [question2, question1],
+        )
+```
+
+Let’s look at some of these more closely.
+
+First is a question shortcut function, **create_question**, to take some repetition out of the process of creating questions.
+
+**test_no_questions** doesn’t create any questions, but checks the message: “No polls are available.” and verifies the **latest_question_list** is empty. Note that the **django.test.TestCase** class provides some additional assertion methods. In these examples, we use **assertContains()** and **assertQuerysetEqual()**.
+
+In **test_past_question**, we create a question and verify that it appears in the list.
+
+In **test_future_question**, we create a question with a **pub_date** in the future. The database is reset for each test method, so the first question is no longer there, and so again the index shouldn’t have any questions in it.
+
+And so on. In effect, we are using the tests to tell a story of admin input and user experience on the site, and checking that at every state and for every new change in the state of the system, the expected results are published.
+
+### Testing the DetailView
+What we have works well; however, even though future questions don’t appear in the index, users can still reach them if they know or guess the right URL. So we need to add a similar constraint to DetailView:
+
+```python
+class DetailView(generic.DetailView):
+    ...
+    def get_queryset(self):
+        """
+        Excludes any questions that aren't published yet.
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
+```
+We should then add some tests, to check that a **Question** whose **pub_date** is in the past can be displayed, and that one with a **pub_date** in the future is not:
+
+```python
+class QuestionDetailViewTests(TestCase):
+    def test_future_question(self):
+        """
+        The detail view of a question with a pub_date in the future
+        returns a 404 not found.
+        """
+        future_question = create_question(question_text='Future question.', days=5)
+        url = reverse('polls:detail', args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self):
+        """
+        The detail view of a question with a pub_date in the past
+        displays the question's text.
+        """
+        past_question = create_question(question_text='Past Question.', days=-5)
+        url = reverse('polls:detail', args=(past_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, past_question.question_text)
+```
+
+### Ideas for more tests
+
+We ought to add a similar **get_queryset** method to **ResultsView** and create a new test class for that view. It’ll be very similar to what we have just created; in fact there will be a lot of repetition.
+
+We could also improve our application in other ways, adding tests along the way. For example, it’s silly that **Questions** can be published on the site that have no **Choices**. So, our views could check for this, and exclude such **Questions**. Our tests would create a **Question** without **Choices** and then test that it’s not published, as well as create a similar **Question** with **Choices**, and test that it is published.
+
+Perhaps logged-in admin users should be allowed to see unpublished **Questions**, but not ordinary visitors. Again: whatever needs to be added to the software to accomplish this should be accompanied by a test, whether you write the test first and then make the code pass the test, or work out the logic in your code first and then write a test to prove it.
+
+At a certain point you are bound to look at your tests and wonder whether your code is suffering from test bloat, which brings us to:
+
+
+#### When testing, more is better
+It might seem that our tests are growing out of control. At this rate there will soon be more code in our tests than in our application, and the repetition is unaesthetic, compared to the elegant conciseness of the rest of our code.
+
+**It doesn’t matter**. Let them grow. For the most part, you can write a test once and then forget about it. It will continue performing its useful function as you continue to develop your program.
+
+Sometimes tests will need to be updated. Suppose that we amend our views so that only **Questions** with **Choices** are published. In that case, many of our existing tests will fail - telling us exactly which tests need to be amended to bring them up to date, so to that extent tests help look after themselves.
+
+At worst, as you continue developing, you might find that you have some tests that are now redundant. Even that’s not a problem; in testing redundancy is a good thing.
+
+As long as your tests are sensibly arranged, they won’t become unmanageable. Good rules-of-thumb include having:
+
+* a separate **TestClass** for each model or view
+* a separate test method for each set of conditions you want to test
+* test method names that describe their function
+
+#### Further testing
+
+This tutorial only introduces some of the basics of testing. There’s a great deal more you can do, and a number of very useful tools at your disposal to achieve some very clever things.
+
+For example, while our tests here have covered some of the internal logic of a model and the way our views publish information, you can use an “in-browser” framework such as Selenium to test the way your HTML actually renders in a browser. These tools allow you to check not just the behavior of your Django code, but also, for example, of your JavaScript. It’s quite something to see the tests launch a browser, and start interacting with your site, as if a human being were driving it! Django includes LiveServerTestCase to facilitate integration with tools like Selenium.
+
+If you have a complex application, you may want to run tests automatically with every commit for the purposes of [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration), so that quality control is itself - at least partially - automated.
+
+A good way to spot untested parts of your application is to check code coverage. This also helps identify fragile or even dead code. If you can’t test a piece of code, it usually means that code should be refactored or removed. Coverage will help to identify dead code. See [Integration with coverage.py](https://docs.djangoproject.com/en/4.1/topics/testing/advanced/#topics-testing-code-coverage) for details.
+
+[Testing in Django](https://docs.djangoproject.com/en/4.1/topics/testing/) has comprehensive information about testing.
+
+
+## Handling Static Files
+This tutorial begins where previous tutorial left off. We’ve built a tested web-poll application, and we’ll now add a stylesheet and an image.
+
+Aside from the HTML generated by the server, web applications generally need to serve additional files — such as images, JavaScript, or CSS — necessary to render the complete web page. In Django, we refer to these files as **“static files”.**
+
+For small projects, this isn’t a big deal, because you can keep the static files somewhere your web server can find it. However, in bigger projects – especially those comprised of multiple apps – dealing with the multiple sets of static files provided by each application starts to get tricky.
+
+That’s what **django.contrib.staticfiles** is for: it collects static files from each of your applications (and any other places you specify) into a single location that can easily be served in production.
+
+Ref : https://docs.djangoproject.com/en/4.1/faq/help/
+
+
+### Customize your app’s look and feel
+
+First, create a directory called **static** in your **polls** directory. Django will look for static files there, similarly to how Django finds templates inside **polls/templates/**.
+
+Django’s **STATICFILES_FINDERS** setting contains a list of finders that know how to discover static files from various sources. One of the defaults is **AppDirectoriesFinder** which looks for a **“static”** subdirectory in each of the **INSTALLED_APPS**, like the one in polls we just created. The admin site uses the same directory structure for its static files.
+
+Within the **static** directory you have just created, create another directory called **polls** and within that create a file called **style.css**. In other words, your stylesheet should be at **polls/static/polls/style.css**. Because of how the **AppDirectoriesFinder** staticfile finder works, you can refer to this static file in Django as **polls/style.css**, similar to how you reference the path for templates.
+
+```
+Static file namespacing
+
+Just like templates, we might be able to get away with putting our static files directly in polls/static (rather than creating another polls subdirectory), but it would actually be a bad idea. Django will choose the first static file it finds whose name matches, and if you had a static file with the same name in a different application, Django would be unable to distinguish between them. We need to be able to point Django at the right one, and the best way to ensure this is by namespacing them. That is, by putting those static files inside another directory named for the application itself.
+
+```
+
+
+Put the following code in that stylesheet (polls/static/polls/style.css):
+
+```css
+li a {
+    color: green;
+}
+```
+Next, add the following at the top of polls/templates/polls/index.html:
+
+```html
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'polls/style.css' %}">
+```
+The `{% static %}` template tag generates the absolute URL of static files.
+
+Reload http://localhost:8000/polls/ and you should see that the question links are green (Django style!) which means that your stylesheet was properly loaded.
+
+
+### Adding a background-image
+Next, we’ll create a subdirectory for images. Create an images subdirectory in the polls/static/polls/ directory. Inside this directory, add any image file that you’d like to use as a background. For the purposes of this tutorial, we’re using a file named background.png, which will have the full path polls/static/polls/images/background.png.
+
+Then, add a reference to your image in your stylesheet (polls/static/polls/style.css):
+
+```css
+body {
+    background: white url("images/background.png") no-repeat;
+}
+```
+Reload http://localhost:8000/polls/ and you should see the background loaded in the top left of the screen.
+
+```
+Warning
+
+The {% static %} template tag is not available for use in static files which aren’t generated by Django, like your stylesheet. You should always use relative paths to link your static files between each other, because then you can change STATIC_URL (used by the static template tag to generate its URLs) without having to modify a bunch of paths in your static files as well.
+```
+
+These are the basics. For more details on settings and other bits included with the framework see the [static files howto](https://docs.djangoproject.com/en/4.1/howto/static-files/) and the [staticfiles reference](https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/). [Deploying static](https://docs.djangoproject.com/en/4.1/howto/static-files/deployment/) files discusses how to use static files on a real server.
