@@ -107,7 +107,7 @@ MY_SETTING = [str(i) for i in range(30)]
 
 When you use Django, you have to tell it which settings you’re using. Do this by using an environment variable, `DJANGO_SETTINGS_MODULE`.
 
-The value of `DJANGO_SETTINGS_MODULE` should be in Python path syntax, e.g. `mysite.settings`. Note that the settings module should be on the Python import search path.
+The value of `DJANGO_SETTINGS_MODULE` should be in Python path syntax, e.g. `mypollingwebapp .settings`. Note that the settings module should be on the Python import search path.
 
 
 ### Creating the Polls app
@@ -118,7 +118,7 @@ Each application you write in Django consists of a Python package that follows a
 
 What’s the difference between a project and an app? An app is a web application that does something – e.g., a blog system, a database of public records or a small poll app. A project is a collection of configuration and apps for a particular website. A project can contain multiple apps. An app can be in multiple projects.
 
-Your apps can live anywhere on your Python path. In this tutorial, we’ll create our poll app in the same directory as your manage.py file so that it can be imported as its own top-level module, rather than a submodule of mysite.
+Your apps can live anywhere on your Python path. In this tutorial, we’ll create our poll app in the same directory as your manage.py file so that it can be imported as its own top-level module, rather than a submodule of mypollingwebapp .
 
 To create your app, make sure you’re in the same directory as manage.py and type this command:
 
@@ -164,7 +164,7 @@ urlpatterns = [
 ]
 ```
 
-The next step is to point the root URLconf at the polls.urls module. In mysite/urls.py, add an import for django.urls.include and insert an include() in the urlpatterns list, so you have:
+The next step is to point the root URLconf at the polls.urls module. In mypollingwebapp /urls.py, add an import for django.urls.include and insert an include() in the urlpatterns list, so you have:
 
 ```python
 from django.contrib import admin
@@ -206,7 +206,7 @@ Arbitrary keyword arguments can be passed in a dictionary to the target view.
 Naming your URL lets you refer to it unambiguously from elsewhere in Django, especially from within templates. This powerful feature allows you to make global changes to the URL patterns of your project while only touching a single file
 
 ### Database setup
-Now, open up `mysite/settings.py`. It’s a normal Python module with module-level variables representing Django settings.
+Now, open up `mypollingwebapp /settings.py`. It’s a normal Python module with module-level variables representing Django settings.
 
 By default, the configuration uses *SQLite*. If you’re new to databases, or you’re just interested in trying Django, this is the easiest choice. *SQLite is included in Python, so you won’t need to install anything else to support your database*. When starting your first real project, however, you may want to use a more scalable database like PostgreSQL, to avoid database-switching headaches down the road.
 
@@ -225,12 +225,12 @@ Ref: https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-DATABASES
 
 >If you’re using a database besides SQLite, make sure you’ve created a database by this point. Do that with “CREATE DATABASE database_name;” within your database’s interactive prompt.
 
-> Also make sure that the database user provided in mysite/settings.py has “create database” privileges. This allows automatic creation of a test database which will be needed in a later tutorial.
+> Also make sure that the database user provided in mypollingwebapp /settings.py has “create database” privileges. This allows automatic creation of a test database which will be needed in a later tutorial.
 
 >If you’re using SQLite, you don’t need to create anything beforehand - the database file will be created automatically when it is needed.
 
 
-While you’re editing mysite/settings.py, set TIME_ZONE to your time zone.
+While you’re editing mypollingwebapp /settings.py, set TIME_ZONE to your time zone.
 
 Also, note the *INSTALLED_APPS* setting at the top of the file. That holds the names of all Django applications that are activated in this Django instance. Apps can be used in multiple projects, and you can package and distribute them for use by others in their projects.
 
@@ -243,7 +243,7 @@ By default, INSTALLED_APPS contains the following apps, all of which come with D
 * django.contrib.messages – A messaging framework.
 * django.contrib.staticfiles – A framework for managing static files.
 
-The migrate command looks at the INSTALLED_APPS setting and creates any necessary database tables according to the database settings in your mysite/settings.py file and the database migrations shipped with the app (we’ll cover those later). You’ll see a message for each migration it applies. If you’re interested, run the command-line client for your database and type \dt (PostgreSQL), SHOW TABLES; (MariaDB, MySQL), .tables (SQLite), or SELECT TABLE_NAME FROM USER_TABLES; (Oracle) to display the tables Django created.
+The migrate command looks at the INSTALLED_APPS setting and creates any necessary database tables according to the database settings in your mypollingwebapp /settings.py file and the database migrations shipped with the app (we’ll cover those later). You’ll see a message for each migration it applies. If you’re interested, run the command-line client for your database and type \dt (PostgreSQL), SHOW TABLES; (MariaDB, MySQL), .tables (SQLite), or SELECT TABLE_NAME FROM USER_TABLES; (Oracle) to display the tables Django created.
 
 ```
 For the minimalists
@@ -307,7 +307,7 @@ Philosophy
 
 Django apps are “pluggable”: You can use an app in multiple projects, and you can distribute apps, because they don’t have to be tied to a given Django installation.
 ```
-To include the app in our project, we need to add a reference to its configuration class in the INSTALLED_APPS setting. The PollsConfig class is in the polls/apps.py file, so its dotted path is 'polls.apps.PollsConfig'. Edit the mysite/settings.py file and add that dotted path to the INSTALLED_APPS setting. It’ll look like this:
+To include the app in our project, we need to add a reference to its configuration class in the INSTALLED_APPS setting. The PollsConfig class is in the polls/apps.py file, so its dotted path is 'polls.apps.PollsConfig'. Edit the mypollingwebapp /settings.py file and add that dotted path to the INSTALLED_APPS setting. It’ll look like this:
 
 ```python
 INSTALLED_APPS = [
@@ -408,7 +408,7 @@ Now, let’s hop into the interactive Python shell and play around with the free
 ```
 python manage.py shell
 ```
-We’re using this instead of simply typing “python”, because manage.py sets the DJANGO_SETTINGS_MODULE environment variable, which gives Django the Python import path to your mysite/settings.py file.
+We’re using this instead of simply typing “python”, because manage.py sets the DJANGO_SETTINGS_MODULE environment variable, which gives Django the Python import path to your mypollingwebapp /settings.py file.
 
 Once you’re in the shell, explore the database API:
 
@@ -656,7 +656,7 @@ def vote(request, question_id):
 
 Take a look in your browser, at “/polls/34/”. It’ll run the detail() method and display whatever ID you provide in the URL. Try “/polls/34/results/” and “/polls/34/vote/” too – these will display the placeholder results and voting pages.
 
-When somebody requests a page from your website – say, “/polls/34/”, Django will load the mysite.urls Python module because it’s pointed to by the *ROOT_URLCONF* setting. It finds the variable named urlpatterns and traverses the patterns in order. After finding the match at 'polls/', it strips off the matching text ("polls/") and sends the remaining text – "34/" – to the ‘polls.urls’ URLconf for further processing. There it matches '<int:question_id>/', resulting in a call to the detail() view like so:
+When somebody requests a page from your website – say, “/polls/34/”, Django will load the mypollingwebapp .urls Python module because it’s pointed to by the *ROOT_URLCONF* setting. It finds the variable named urlpatterns and traverses the patterns in order. After finding the match at 'polls/', it strips off the matching text ("polls/") and sends the remaining text – "34/" – to the ‘polls.urls’ URLconf for further processing. There it matches '<int:question_id>/', resulting in a call to the detail() view like so:
 
 ```
 detail(request=<HttpRequest object>, question_id=34)
@@ -1804,7 +1804,7 @@ You can change it, though, using Django’s template system. The Django admin is
 
 Create a templates directory in your project directory (the one that contains manage.py). Templates can live anywhere on your filesystem that Django can access. (Django runs as whatever user your server runs.) However, keeping your templates within the project is a good convention to follow.
 
-Open your settings file (mysite/settings.py, remember) and add a DIRS option in the TEMPLATES setting:
+Open your settings file (mypollingwebapp /settings.py, remember) and add a DIRS option in the TEMPLATES setting:
 
 ```python
 TEMPLATES = [
@@ -1866,4 +1866,208 @@ By default, it displays all the apps in INSTALLED_APPS that have been registered
 
 
 The template to customize is admin/index.html. (Do the same as with admin/base_site.html in the previous section – copy it from the default directory to your custom template directory). Edit the file, and you’ll see it uses a template variable called app_list. That variable contains every installed Django app. Instead of using that, you can hard-code links to object-specific admin pages in whatever way you think is best.
+
+Date : 25 Aug 2022
+
+------------------
+### Advanced Tutorial : How to write re usable apps
+
+We’ll be turning our web-poll into a standalone Python package you can reuse in new projects and share with other people
+
+#### Reusability matters
+
+It’s a lot of work to design, build, test and maintain a web application. Many Python and Django projects share common problems. Wouldn’t it be great if we could save some of this repeated work?
+
+Reusability is the way of life in Python. The [Python Package Index (PyPI)](https://pypi.org/) has a vast range of packages you can use in your own Python programs. Check out [Django Packages](https://djangopackages.org/) for existing reusable apps you could incorporate in your project. Django itself is also a normal Python package. This means that you can take existing Python packages or Django apps and compose them into your own web project. You only need to write the parts that make your project unique.
+
+Let’s say you were starting a new project that needed a polls app like the one we’ve been working on. How do you make this app reusable? Luckily, you’re well on the way already. In Tutorial 1, we saw how we could decouple polls from the project-level URLconf using an include. In this tutorial, we’ll take further steps to make the app easy to use in new projects and ready to publish for others to install and use.
+
+```
+Package? App?
+-----------
+
+A Python package provides a way of grouping related Python code for easy reuse. A package contains one or more files of Python code (also known as “modules”).
+
+A package can be imported with import foo.bar or from foo import bar. For a directory (like polls) to form a package, it must contain a special file __init__.py, even if this file is empty.
+
+A Django application is a Python package that is specifically intended for use in a Django project. An application may use common Django conventions, such as having models, tests, urls, and views submodules.
+
+Later on we use the term packaging to describe the process of making a Python package easy for others to install. It can be a little confusing, we know.
+```
+
+#### Your project and your reusable app
+
+After the previous tutorials, our project should look like this:
+
+```
+mypollingwebapp /
+    manage.py
+    mypollingwebapp /
+        __init__.py
+        settings.py
+        urls.py
+        asgi.py
+        wsgi.py
+    polls/
+        __init__.py
+        admin.py
+        apps.py
+        migrations/
+            __init__.py
+            0001_initial.py
+        models.py
+        static/
+            polls/
+                images/
+                    background.gif
+                style.css
+        templates/
+            polls/
+                detail.html
+                index.html
+                results.html
+        tests.py
+        urls.py
+        views.py
+    templates/
+        admin/
+            base_site.html
+```
+
+You created mypollingwebapp /templates and polls/templates in previous tutorials. Now perhaps it is clearer why we chose to have separate template directories for the project and application: everything that is part of the polls application is in polls. It makes the application self-contained and easier to drop into a new project.
+
+The polls directory could now be copied into a new Django project and immediately reused. It’s not quite ready to be published though. For that, we need to package the app to make it easy for others to install.
+
+#### Installing some prerequisites
+The current state of Python packaging is a bit muddled with various tools. For this tutorial, we’re going to use [setuptools](https://pypi.org/project/setuptools/) to build our package. It’s the recommended packaging tool (merged with the **distribute** fork). We’ll also be using pip to install and uninstall it. You should install these two packages now. If you need help, you can refer to [how to install Django with pip](https://docs.djangoproject.com/en/4.1/topics/install/#installing-official-release). You can install setuptools the same way.
+
+#### Packaging your app
+Python packaging refers to preparing your app in a specific format that can be easily installed and used. Django itself is packaged very much like this. For a small app like polls, this process isn’t too difficult.
+
+1. First, create a parent directory for polls, outside of your Django project. Call this directory django-polls.
+
+```
+Choosing a name for your app
+
+When choosing a name for your package, check resources like PyPI to avoid naming conflicts with existing packages. It’s often useful to prepend django- to your module name when creating a package to distribute. This helps others looking for Django apps identify your app as Django specific.
+
+Application labels (that is, the final part of the dotted path to application packages) must be unique in INSTALLED_APPS. Avoid using the same label as any of the Django contrib packages, for example auth, admin, or messages.
+ref : https://docs.djangoproject.com/en/4.1/ref/contrib/ 
+```
+2. Move the polls directory into the django-polls directory.
+3. Create a file django-polls/README.rst with the following contents:
+```rst   
+=====
+Polls
+=====
+
+Polls is a Django app to conduct web-based polls. For each question,
+visitors can choose between a fixed number of answers.
+
+Detailed documentation is in the "docs" directory.
+
+Quick start
+-----------
+
+1. Add "polls" to your INSTALLED_APPS setting like this::
+
+    INSTALLED_APPS = [
+        ...
+        'polls',
+    ]
+
+2. Include the polls URLconf in your project urls.py like this::
+
+    path('polls/', include('polls.urls')),
+
+3. Run ``python manage.py migrate`` to create the polls models.
+
+4. Start the development server and visit http://127.0.0.1:8000/admin/
+   to create a poll (you'll need the Admin app enabled).
+
+5. Visit http://127.0.0.1:8000/polls/ to participate in the poll.
+```
+4. Create a django-polls/LICENSE file. Choosing a license is beyond the scope of this tutorial, but suffice it to say that code released publicly without a license is useless. Django and many Django-compatible apps are distributed under the BSD license; however, you’re free to pick your own license. Just be aware that your licensing choice will affect who is able to use your code.
+5. Next we’ll create **pyproject.toml**, **setup.cfg**, and **setup.py** files which detail how to build and install the app. A full explanation of these files is beyond the scope of this tutorial, but the [setuptools documentation](https://setuptools.pypa.io/en/latest/) has a good explanation. Create the django-polls/pyproject.toml, django-polls/setup.cfg, and django-polls/setup.py files with the following contents:
+
+**django-polls/pyproject.toml**
+```toml
+[build-system]
+requires = ['setuptools>=40.8.0', 'wheel']
+build-backend = 'setuptools.build_meta:__legacy__'
+```
+**django-polls/setup.cfg**
+```ini
+[metadata]
+name = django-polls
+version = 0.1
+description = A Django app to conduct web-based polls.
+long_description = file: README.rst
+url = https://www.example.com/
+author = Your Name
+author_email = yourname@example.com
+license = BSD-3-Clause  # Example license
+classifiers =
+    Environment :: Web Environment
+    Framework :: Django
+    Framework :: Django :: X.Y  # Replace "X.Y" as appropriate
+    Intended Audience :: Developers
+    License :: OSI Approved :: BSD License
+    Operating System :: OS Independent
+    Programming Language :: Python
+    Programming Language :: Python :: 3
+    Programming Language :: Python :: 3 :: Only
+    Programming Language :: Python :: 3.8
+    Programming Language :: Python :: 3.9
+    Topic :: Internet :: WWW/HTTP
+    Topic :: Internet :: WWW/HTTP :: Dynamic Content
+
+[options]
+include_package_data = true
+packages = find:
+python_requires = >=3.8
+install_requires =
+    Django >= X.Y  # Replace "X.Y" as appropriate
+```
+**django-polls/setup.py**
+
+```python
+from setuptools import setup
+
+setup()
+```
+6. Only Python modules and packages are included in the package by default. To include additional files, we’ll need to create a MANIFEST.in file. The setuptools docs referred to in the previous step discuss this file in more detail. To include the templates, the README.rst and our LICENSE file, create a file django-polls/MANIFEST.in with the following contents:
+
+```in
+include LICENSE
+include README.rst
+recursive-include polls/static *
+recursive-include polls/templates *
+```
+7. It’s optional, but recommended, to include detailed documentation with your app. Create an empty directory django-polls/docs for future documentation. Add an additional line to django-polls/MANIFEST.in:
+
+```
+recursive-include docs *
+```
+Note that the docs directory won’t be included in your package unless you add some files to it. Many Django apps also provide their documentation online through sites like readthedocs.org.
+
+8. Try building your package with **python setup.py sdist** (run from inside django-polls). This creates a directory called dist and builds your new package, django-polls-0.1.tar.gz.
+
+
+#### Using your own package
+Since we moved the polls directory out of the project, it’s no longer working. We’ll now fix this by installing our new django-polls package.
+
+```
+Installing as a user library
+
+The following steps install django-polls as a user library. Per-user installs have a lot of advantages over installing the package system-wide, such as being usable on systems where you don’t have administrator access as well as preventing the package from affecting system services and other users of the machine.
+
+Note that per-user installations can still affect the behavior of system tools that run as that user, so using a virtual environment is a more robust solution (see below).
+```
+1. To install the package, use pip
+```
+python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
+```
+
+2. With luck, your Django project should now work correctly again. Run the server again to confirm this.
 
