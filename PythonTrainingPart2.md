@@ -529,236 +529,582 @@ Date : 29 July 2022
 
 __________________
 
-## Iterators
-Iterator in python is an object that is used to iterate over iterable objects like lists, tuples, dicts, and sets. The iterator object is initialized using the iter() method. It uses the next() method for iteration.
+## Context Managers (`with` statement)
 
+Context managers are a powerful Python feature used for managing resources effectively. They ensure that resources are properly acquired and, more importantly, released, even if errors occur. This is crucial for operations like file handling, network connections, or database interactions.
 
-```__iter(iterable)__ ```  method that is called for the initialization of an iterator. This returns an iterator object
+The primary way to use a context manager is with the `with` statement.
 
-``` next ( __next__ in Python 3)  ``` The next method returns the next value for the iterable. When we use a for loop to traverse any iterable object, internally it uses the iter() method to get an iterator object which further uses next() method to iterate over. This method raises a StopIteration to signal the end of the iteration.
+**Purpose:**
 
-How an iterator really works in python
+*   **Resource Management:** To ensure resources (like files, locks, connections) are set up and torn down correctly.
+*   **Automatic Cleanup:** Guarantees that cleanup actions (e.g., closing a file) are performed automatically.
+*   **Error Handling:** Provides a clean way to handle exceptions that might occur while using the resource.
+*   **Readability:** Makes code cleaner and easier to understand by abstracting resource management logic.
+
+**Syntax: `with open(...) as f:`**
+
+The most common example is opening a file:
 
 ```python
-# Here is an example of a python inbuilt iterator
-# value can be anything which can be iterate
-iterable_value = 'Geeks'
-iterable_obj = iter(iterable_value)
+# Example: Using 'with' to open a file
+print("--- Using 'with' for file handling ---")
+try:
+    with open("example.txt", "w") as f:
+        f.write("Hello, context managers!\n")
+        f.write("This file will be automatically closed.\n")
+        # f.read() # Uncommenting this would cause an error as the file is opened in write mode 'w'
+    print("File 'example.txt' written and closed successfully.")
 
-while True:
-	try:
+    with open("example.txt", "r") as f:
+        content = f.read()
+        print("\nFile content:")
+        print(content)
+    print("File 'example.txt' read and closed successfully.")
 
-		# Iterate by calling next
-		item = next(iterable_obj)
-		print(item)
-	except StopIteration:
+except IOError as e:
+    print(f"An IOError occurred: {e}")
+```
+Output (will vary slightly if example.txt is not cleaned up between runs, but the content will be as written):
+```
+--- Using 'with' for file handling ---
+File 'example.txt' written and closed successfully.
 
-		# exception will happen when iteration will over
-		break
+File content:
+Hello, context managers!
+This file will be automatically closed.
+
+File 'example.txt' read and closed successfully.
+```
+In this example, `open("example.txt", "w")` returns a file object that is also a context manager. The `as f` part assigns this object to the variable `f`. When the `with` block is exited (either normally or due to an exception), Python automatically calls a special method on the file object that closes the file.
+
+**Before and After: Manual `try/finally` vs. `with`**
+
+Let's see how context managers simplify resource handling compared to manual `try...finally` blocks.
+
+**1. Manual File Handling (Before `with`):**
+
+```python
+# Manual file handling with try/finally
+print("\n--- Manual file handling (try/finally) ---")
+f = None # Initialize f outside try in case open() fails
+try:
+    f = open("manual_example.txt", "w")
+    f.write("This is a manually managed file.\n")
+    # Imagine an error occurring here:
+    # raise ValueError("Something went wrong!") 
+    print("File 'manual_example.txt' written (still open).")
+except IOError as e:
+    print(f"An IOError occurred: {e}")
+except ValueError as ve:
+    print(f"A ValueError occurred: {ve}")
+finally:
+    if f: # Check if f was successfully assigned (file opened)
+        print("Closing file in 'finally' block.")
+        f.close()
+    else:
+        print("File was not opened, nothing to close in 'finally'.")
 ```
 Output:
 ```
-G                                                                                                                                                                            
-e                                                                                                                                                                            
-e                                                                                                                                                                            
-k                                                                                                                                                                            
-s
-
-
-
+--- Manual file handling (try/finally) ---
+File 'manual_example.txt' written (still open).
+Closing file in 'finally' block.
 ```
-Below is a simple Python custom iterator that creates iterator type that iterates from 10 to a given limit. For example, if the limit is 15, then it prints 10 11 12 13 14 15. And if the limit is 5, then it prints nothing.
+If you uncomment `raise ValueError(...)`, the output would show the ValueError being caught and the file still being closed.
+
+**2. Using `with` Statement (After):**
 
 ```python
-# A simple Python program to demonstrate
-# working of iterators using an example type
-# that iterates from 10 to given value
+# File handling with 'with' statement
+print("\n--- File handling with 'with' statement ---")
+try:
+    with open("with_example.txt", "w") as f:
+        f.write("This file is managed by a 'with' statement.\n")
+        # Imagine an error occurring here:
+        # raise ValueError("Something went wrong with 'with'!")
+        print("File 'with_example.txt' written (will be auto-closed).")
+    # No need for an explicit f.close() or a finally block for closing.
+except IOError as e:
+    print(f"An IOError occurred: {e}")
+except ValueError as ve:
+    print(f"A ValueError occurred during 'with': {ve}")
 
-# An iterable user defined type
-class Test:
-
-	# Constructor
-	def __init__(self, limit):
-		self.limit = limit
-
-	# Creates iterator object
-	# Called when iteration is initialized
-	def __iter__(self):
-		self.x = 10
-		return self
-
-	# To move to next element. In Python 3,
-	# we should replace next with __next__
-	def __next__(self):
-
-		# Store current value ofx
-		x = self.x
-
-		# Stop iteration if limit is reached
-		if x > self.limit:
-			raise StopIteration
-
-		# Else increment and return old value
-		self.x = x + 1;
-		return x
-
-# Prints numbers from 10 to 15
-for i in Test(15):
-	print(i)
-
-# Prints nothing
-for i in Test(5):
-	print(i)
+print("Exited 'with' block for 'with_example.txt'.")
 ```
-
 Output:
 ```
-10
-11
-12
-13
-14
-15
+--- File handling with 'with' statement ---
+File 'with_example.txt' written (will be auto-closed).
+Exited 'with' block for 'with_example.txt'.
 ```
+If you uncomment `raise ValueError(...)` inside the `with` block, the ValueError will be caught, and the file `with_example.txt` will *still* be closed automatically before the exception handling proceeds.
 
-## When to use yield instead of return in Python?
-The yield statement suspends a function’s execution and sends a value back to the caller, but retains enough state to enable the function to resume where it left off. When the function resumes, it continues execution immediately after the last yield run. This allows its code to produce a series of values over time, rather than computing them at once and sending them back like a list.
+**Benefits of Using `with` (Context Managers):**
 
-Example:
+| Benefit             | Description                                                                                                |
+|---------------------|------------------------------------------------------------------------------------------------------------|
+| **Automatic Cleanup** | Resources are guaranteed to be released, preventing resource leaks (e.g., too many open files).        |
+| **Readability**       | Code is cleaner and more concise as resource setup and teardown logic is abstracted.                     |
+| **Error Handling**    | Simplifies exception handling around resource usage; cleanup occurs even if errors are raised.             |
+| **Reusability**       | You can create your own context managers for custom resource types by implementing `__enter__` and `__exit__` methods. |
+
+Context managers are a fundamental part of writing robust and idiomatic Python code, especially when dealing with external resources.
+
+## Iterators and Generators
+
+This section explores how Python handles iteration, a fundamental concept for processing sequences of data.
+
+### Iterators
+
+An **iterator** in Python is an object that enables traversal through all elements of an iterable object (like lists, tuples, dictionaries, and sets) one at a time. The iterator pattern consists of two main parts:
+
+1.  **The Iterable:** An object that can be iterated over. It must implement the `__iter__()` method, which returns an iterator object.
+2.  **The Iterator:** An object that actually performs the iteration. It must implement the `__next__()` method to return the next item and `__iter__()` method to return itself.
+
+**Core Methods for Iteration:**
+
+*   **`iter(iterable)`:**
+    *   This built-in function is called on an iterable object (e.g., a list).
+    *   It returns an **iterator object** for that iterable.
+    *   Internally, this calls the iterable's `__iter__()` method.
+
+*   **`next(iterator)`:**
+    *   This built-in function is called on an iterator object.
+    *   It retrieves the next item from the iterator.
+    *   Internally, this calls the iterator's `__next__()` method.
+    *   If there are no more items to return, it raises a `StopIteration` exception, signaling that the iteration is complete.
+
+**How `for` loops use iterators:**
+
+When you use a `for` loop (e.g., `for item in my_list:`), Python automatically does the following:
+1.  Calls `iter(my_list)` to get an iterator object.
+2.  Repeatedly calls `next()` on this iterator object to get each item.
+3.  Assigns the item to the loop variable (e.g., `item`).
+4.  Handles the `StopIteration` exception gracefully to terminate the loop.
+
+**Example: Manual Iteration**
+
+This shows what Python does behind the scenes during a `for` loop:
+
 ```python
-# A Simple Python program to demonstrate working
-# of yield
+```python
+# Example: Manual iteration with iter() and next()
+print("--- Manual Iteration Example ---")
+my_string = "Hi"
+my_iterator = iter(my_string) # Get an iterator object for the string
 
-# A generator function that yields 1 for the first time,
-# 2 second time and 3 third time
-
-
-def simpleGeneratorFun():
-	yield 1
-	yield 2
-	yield 3
-
-
-# Driver code to check above generator function
-for value in simpleGeneratorFun():
-	print(value)
-
+try:
+    print(next(my_iterator)) # Output: H
+    print(next(my_iterator)) # Output: i
+    print(next(my_iterator)) # This will raise StopIteration
+except StopIteration:
+    print("Iteration is complete (StopIteration caught).")
 ```
-
 Output:
 ```
+--- Manual Iteration Example ---
+H
+i
+Iteration is complete (StopIteration caught).
+```
+
+**Custom Iterators (Class-based):**
+
+You can create your own iterators by defining a class that implements the `__iter__()` and `__next__()` methods.
+
+```python
+# Example: Custom iterator for a range-like sequence
+print("\n--- Custom Iterator Example (MyRange) ---")
+class MyRange:
+    """A simple custom iterator that mimics range()."""
+    def __init__(self, start, end):
+        self.current = start
+        self.end = end
+
+    def __iter__(self):
+        # This method makes an object iterable.
+        # It should return an iterator object (often self).
+        return self
+
+    def __next__(self):
+        # This method should return the next item in the sequence.
+        # It must raise StopIteration when there are no more items.
+        if self.current < self.end:
+            value = self.current
+            self.current += 1
+            return value
+        else:
+            raise StopIteration
+
+# Using the custom iterator
+print("Iterating from 1 to 3 (exclusive):")
+for num in MyRange(1, 3):
+    print(num)
+
+print("\nIterating from 10 to 12 (exclusive) with no items to print if start >= end:")
+# This loop won't execute if MyRange(12,10) was used, 
+# because the first __next__ call would immediately raise StopIteration
+for num in MyRange(12, 10): # Start is not less than end
+     print(num) # This line won't be reached
+print("Finished MyRange(12,10) loop.")
+```
+Output:
+```
+--- Custom Iterator Example (MyRange) ---
+Iterating from 1 to 3 (exclusive):
 1
 2
-3
-```
-"Return" sends a specified value back to its caller whereas Yield can produce a sequence of values. We should use yield when we want to iterate over a sequence, but don’t want to store the entire sequence in memory. Yield is used in Python generators. A generator function is defined just like a normal function, but whenever it needs to generate a value, it does so with the yield keyword rather than return. If the body of a def contains yield, the function automatically becomes a generator function. 
 
-```python
-# A Python program to generate squares from 1
-# to 100 using yield and therefore generator
-
-# An infinite generator function that prints
-# next square number. It starts with 1
-
-
-def nextSquare():
-	i = 1
-
-	# An Infinite loop to generate squares
-	while True:
-		yield i*i
-		i += 1 # Next execution resumes
-		# from this point
-
-
-# Driver code to test above generator
-# function
-for num in nextSquare():
-	if num & gt
-	100:
-		break
-	print(num)
+Iterating from 10 to 12 (exclusive) with no items to print if start >= end:
+Finished MyRange(12,10) loop.
 ```
 
-## Generators in Python
-Generator-Function : A generator-function is defined like a normal function, but whenever it needs to generate a value, it does so with the yield keyword rather than return. If the body of a def contains yield, the function automatically becomes a generator function
+### Generators
 
-Generator-Object : Generator functions return a generator object. Generator objects are used either by calling the next method on the generator object or using the generator object in a “for in” loop (as shown in the above program).
+Generators provide a more convenient way to create iterators. A generator is a special type of function that returns an iterator object which can be iterated upon one value at a time.
+
+**`yield` vs. `return`:**
+
+*   **`return`:** When a `return` statement is encountered in a function, it terminates the function's execution entirely and sends a specified value (or `None`) back to its caller. The function's local state (variables) is discarded.
+*   **`yield`:** When a `yield` statement is encountered, the function's execution is **paused**, and the yielded value is sent back to the caller. Crucially, the function's local state (variables, instruction pointer) is **preserved**. When the iterator's `next()` method is called again, the function resumes execution right after the `yield` statement, with its previous state intact.
+
+This "pausing" and "resuming" behavior allows `yield` to produce a sequence of values over time, making it highly memory-efficient, especially for large sequences, as it doesn't need to compute and store all values in memory at once.
+
+**Generator Functions:**
+
+A function becomes a generator function if it contains one or more `yield` statements.
 
 ```python
-# A Python program to demonstrate use of
-# generator object with next()
+# Example: A simple generator function
+print("\n--- Simple Generator Function Example ---")
+def simple_generator():
+    print("Generator started...")
+    yield 10
+    print("Generator resumed after first yield...")
+    yield 20
+    print("Generator resumed after second yield...")
+    yield 30
+    print("Generator finished.")
 
-# A generator function
-def simpleGeneratorFun():
-	yield 1
-	yield 2
-	yield 3
+# Using the generator function
+my_gen_obj = simple_generator() # Calling the function returns a generator object
+print(f"Generator object: {my_gen_obj}")
 
-# x is a generator object
-x = simpleGeneratorFun()
+try:
+    print(f"First value: {next(my_gen_obj)}")
+    print(f"Second value: {next(my_gen_obj)}")
+    print(f"Third value: {next(my_gen_obj)}")
+    print(next(my_gen_obj)) # This will raise StopIteration
+except StopIteration:
+    print("StopIteration caught as expected.")
 
-# Iterating over the generator object using next
-print(x.next()) # In Python 3, __next__()
-print(x.next())
-print(x.next())
-
+print("\nIterating with a for loop (re-creating the generator):")
+# For loop handles StopIteration automatically
+for value in simple_generator(): 
+    print(f"Value from for loop: {value}")
 ```
 Output:
 ```
+--- Simple Generator Function Example ---
+Generator object: <generator object simple_generator at 0x...>
+Generator started...
+First value: 10
+Generator resumed after first yield...
+Second value: 20
+Generator resumed after second yield...
+Third value: 30
+Generator finished.
+StopIteration caught as expected.
+
+Iterating with a for loop (re-creating the generator):
+Generator started...
+Value from for loop: 10
+Generator resumed after first yield...
+Value from for loop: 20
+Generator resumed after second yield...
+Value from for loop: 30
+Generator finished.
+```
+
+**Example: Generating Squares (Memory Efficient)**
+
+```python
+# Example: Generator for squares
+print("\n--- Generator for Squares Example ---")
+def squares_generator(n):
+    print(f"Initializing squares_generator up to {n-1}")
+    for i in range(n):
+        yield i * i # Pauses here and yields the square
+        # Resumes here on next call to next()
+
+# Using the squares generator
+limit = 5
+sq_gen = squares_generator(limit)
+print(f"Generator object for squares: {sq_gen}")
+
+print(f"\nSquares up to {limit-1}:")
+for sq in sq_gen:
+    print(sq)
+
+# Example: Using a generator for a potentially large sequence
+print("\n--- Squares up to 100 (stopping early) ---")
+for num_sq in squares_generator(1000): # Potentially a million squares
+    if num_sq > 100: # Corrected: > instead of &gt;
+        break
+    print(num_sq)
+```
+Output:
+```
+--- Generator for Squares Example ---
+Initializing squares_generator up to 4
+Generator object for squares: <generator object squares_generator at 0x...>
+
+Squares up to 4:
+0
 1
-2
-3
+4
+9
+16
+
+--- Squares up to 100 (stopping early) ---
+Initializing squares_generator up to 999
+0
+1
+4
+9
+16
+25
+36
+49
+64
+81
+100
 ```
-So a generator function returns an generator object that is iterable, i.e., can be used as an Iterators .
+
+**Generator Objects:**
+
+*   When you call a generator function, it doesn't execute the function body immediately. Instead, it returns a **generator object** (which is a type of iterator).
+*   The code in the generator function is executed only when `next()` is called on the generator object.
+*   Generator objects can be used in `for` loops or with `next()` directly.
 
 ```python
-# A simple generator for Fibonacci Numbers
-def fib(limit):
-	
-	# Initialize first two Fibonacci Numbers
-	a, b = 0, 1
+# Example: Using next() with a generator object
+print("\n--- Using next() with Generator Object ---")
+def simple_gen_for_next():
+    yield "first"
+    yield "second"
 
-	# One by one yield next Fibonacci Number
-	while a < limit:
-		yield a
-		a, b = b, a + b
-
-# Create a generator object
-x = fib(5)
-
-# Iterating over the generator object using next
-print(x.next()) # In Python 3, __next__()
-print(x.next())
-print(x.next())
-print(x.next())
-print(x.next())
-
-# Iterating over the generator object using for
-# in loop.
-print("\nUsing for in loop")
-for i in fib(5):
-	print(i)
+gen_obj_next = simple_gen_for_next()
+print(f"Value from next(): {next(gen_obj_next)}") # In Python 3, it's just next()
+print(f"Value from next(): {next(gen_obj_next)}")
+# print(next(gen_obj_next)) # Would raise StopIteration
 ```
-
 Output:
-
 ```
+--- Using next() with Generator Object ---
+Value from next(): first
+Value from next(): second
+```
+A generator function returns a generator object that is iterable, i.e., it can be used as an iterator.
+
+**Example: Fibonacci Sequence Generator**
+
+```python
+# Example: Fibonacci sequence generator
+print("\n--- Fibonacci Sequence Generator ---")
+def fibonacci_generator(limit):
+    a, b = 0, 1          # Initialize first two Fibonacci numbers
+    while a < limit:     # Loop as long as 'a' is less than the limit
+        yield a          # Yield the current Fibonacci number 'a'
+        a, b = b, a + b  # Update 'a' and 'b' for the next iteration
+
+# Create a generator object for Fibonacci numbers up to 5
+fib_gen = fibonacci_generator(5)
+print(f"Fibonacci generator object: {fib_gen}")
+
+print("\nFibonacci sequence (first few numbers using next()):")
+# Iterating over the generator object using next()
+# Note: Python 3 uses __next__() internally, but you call it with next()
+try:
+    print(next(fib_gen))
+    print(next(fib_gen))
+    print(next(fib_gen))
+    print(next(fib_gen))
+    print(next(fib_gen)) # This will be the last one before limit (5) is reached for 'a'
+    print(next(fib_gen)) # This call will raise StopIteration
+except StopIteration:
+    print("StopIteration: No more Fibonacci numbers to generate within the limit.")
+
+# Iterating over a new generator object using a for loop
+print("\nFibonacci sequence (using for loop):")
+for num in fibonacci_generator(5): # Creates a new generator object
+    print(num)
+```
+Output:
+```
+--- Fibonacci Sequence Generator ---
+Fibonacci generator object: <generator object fibonacci_generator at 0x...>
+
+Fibonacci sequence (first few numbers using next()):
 0
 1
 1
 2
 3
+StopIteration: No more Fibonacci numbers to generate within the limit.
 
-Using for in loop
+Fibonacci sequence (using for loop):
 0
 1
 1
 2
 3
 ```
-Applications : Suppose we to create a stream of Fibonacci numbers, adopting the generator approach makes it trivial; we just have to call next(x) to get the next Fibonacci number without bothering about where or when the stream of numbers ends.
-A more practical type of stream processing is handling large data files such as log files. Generators provide a space efficient method for such data processing as only parts of the file are handled at one given point in time. We can also use Iterators for these purposes, but Generator provides a quick way (We don’t need to write __next__ and __iter__ methods here).
+
+**Applications of Generators:**
+
+*   **Memory Efficiency:** Ideal for working with large datasets or streams of data (e.g., reading large files line by line) because they only load one item into memory at a time.
+*   **Infinite Sequences:** Can be used to represent infinite sequences (e.g., a counter that never ends) since values are generated on demand.
+*   **Pipeline Data Processing:** Generators can be chained together to create efficient data processing pipelines.
+*   **Simpler than Custom Iterators:** For many use cases, writing a generator function is much simpler than creating a custom iterator class with `__iter__()` and `__next__()`.
+
+## Generator Expressions
+
+Generator expressions offer a concise and memory-efficient way to create iterators. They are syntactically similar to list comprehensions but use parentheses `()` instead of square brackets `[]`.
+
+**Key Characteristics:**
+
+*   **Memory Efficiency:** Unlike list comprehensions, which create the entire list in memory at once, generator expressions produce items one at a time and only when requested (lazy evaluation). This makes them ideal for working with large datasets or infinite sequences.
+*   **Lazy Evaluation:** Values are generated on-the-fly as you iterate over the generator. They are not all computed and stored in memory upfront.
+*   **Iterator Protocol:** Generator expressions return a generator object, which is a type of iterator.
+
+**Syntax:**
+
+The basic syntax is very similar to a list comprehension, but with parentheses:
+
+```python
+(expression for item in iterable if condition)
+```
+
+*   `expression`: The expression to compute for each item.
+*   `item`: The variable representing each element in the `iterable`.
+*   `iterable`: The sequence or collection to iterate over.
+*   `condition` (optional): A filter that only includes items for which the condition is true.
+
+**Examples:**
+
+#### 1. Simple Generator Expression for Squares
+
+Let's create a generator for the squares of numbers.
+
+```python
+# List comprehension (creates a list in memory)
+list_comp_squares = [x*x for x in range(5)]
+print(f"List comprehension: {list_comp_squares}") 
+
+# Generator expression (creates a generator object)
+gen_exp_squares = (x*x for x in range(5))
+print(f"Generator expression object: {gen_exp_squares}")
+
+print("\nIterating through the generator expression:")
+for square in gen_exp_squares:
+    print(square)
+```
+Output:
+```
+List comprehension: [0, 1, 4, 9, 16]
+Generator expression object: <generator object <genexpr> at 0x...> # Address will vary
+Iterating through the generator expression:
+0
+1
+4
+9
+16
+```
+Notice that printing the generator expression itself shows a generator object, not the values. The values are produced when you iterate over it.
+
+#### 2. Using with `sum()`, `min()`, `max()`
+
+Generator expressions can be particularly useful when you want to perform an aggregation (like sum, min, max) on a sequence without materializing the entire sequence in memory.
+
+```python
+# Example: Summing squares using a generator expression
+print("\n--- Summing with a generator expression ---")
+sum_of_squares = sum(x*x for x in range(1, 1000001)) # Sum squares from 1 to 1,000,000
+print(f"Sum of squares (1 to 1,000,000): {sum_of_squares}")
+# This is memory efficient as it doesn't create a list of a million squares.
+
+numbers = [10, 5, 20, 8, 15]
+max_val_gen = max(n * 2 for n in numbers if n % 2 == 0) # Max of doubled even numbers
+print(f"Max of doubled even numbers: {max_val_gen}")
+```
+Output:
+```
+--- Summing with a generator expression ---
+Sum of squares (1 to 1,000,000): 333333833333500000 
+Max of doubled even numbers: 40
+```
+
+#### 3. Iterating with `next()`
+
+Since a generator expression returns an iterator, you can use the `next()` function to get its items one by one.
+
+```python
+# Example: Iterating with next()
+print("\n--- Iterating with next() ---")
+gen_exp = (val for val in "Python")
+
+print(next(gen_exp)) # P
+print(next(gen_exp)) # y
+print(next(gen_exp)) # t
+# ... and so on
+# If you call next() after all items are exhausted, it raises StopIteration
+```
+Output:
+```
+--- Iterating with next() ---
+P
+y
+t
+```
+
+#### 4. Chaining Generator Expressions
+
+Generator expressions can be chained for multi-step data processing pipelines that remain memory-efficient.
+
+```python
+# Example: Chaining generator expressions
+print("\n--- Chaining generator expressions ---")
+data = [1, 2, 3, 4, 5, 6, 7, 8]
+
+# First, filter even numbers
+evens = (x for x in data if x % 2 == 0)
+# Next, square the even numbers
+squared_evens = (x*x for x in evens) # This 'evens' is itself a generator
+
+print("Squared even numbers from chained generators:")
+for val in squared_evens:
+    print(val)
+```
+Output:
+```
+--- Chaining generator expressions ---
+Squared even numbers from chained generators:
+4
+16
+36
+64
+```
+Each step in the chain processes items lazily.
+
+**When to Use Generator Expressions:**
+
+*   When working with very large datasets where creating a full list in memory would be inefficient or impossible.
+*   When you need to produce a sequence of items but only need to iterate over them once (e.g., for summing or processing in a loop).
+*   For creating data processing pipelines that are memory-efficient.
+
+Generator expressions are a key tool for writing memory-efficient and Pythonic code.
 
 ## Short Hand if-else statement
 This can be used to write the if-else statements in a single line where there is only one statement to be executed in both if and else block. 
@@ -970,7 +1316,7 @@ except NameError:
 
 ```
 
-The output of the above code will simply line printed as “An exception” but a Runtime error will also occur in the last due to the raise statement in the last line. So, the output on your command line will look like 
+The output of the above code will simply line printed as “An exception” but a Runtime error will also occur in the last due to the raise statement in the last line. So, the output on your command line will look like
 
 ```
 Traceback (most recent call last):
@@ -979,894 +1325,1042 @@ Traceback (most recent call last):
 NameError: Hi there
 ```
 
+#### Comprehensive Example of Exception Handling
 
-## Function Decorator
-
-Decorators are a very powerful and useful tool in Python since it allows programmers to modify the behaviour of a function or class. Decorators allow us to wrap another function in order to extend the behaviour of the wrapped function, without permanently modifying it. But before diving deep into decorators let us understand some concepts that will come in handy in learning the decorators.
-
-### First Class Objects
-In Python, functions are first class objects which means that functions in Python can be used or passed as arguments.
-Properties of first class functions:
-
-* A function is an instance of the Object type.
-* You can store the function in a variable.
-* You can pass the function as a parameter to another function.
-* You can return the function from a function.
-* You can store them in data structures such as hash tables, lists, …
-
-### Example 2: Passing the function as an argument 
+Let's consider a scenario where we try to process a list of numbers, performing division and potential type conversion.
 
 ```python
-# Python program to illustrate functions
-# can be passed as arguments to other functions
-def shout(text):
-	return text.upper()
+# Comprehensive Exception Handling Example
+def process_data(data_list, divisor_str):
+    results = []
+    print(f"\n--- Processing with divisor: '{divisor_str}' ---")
+    try:
+        # Attempt to convert divisor to a float
+        divisor = float(divisor_str)
+        if divisor == 0:
+            # Custom raise for a logical error not caught by standard exceptions
+            raise ValueError("Divisor cannot be zero for logical reasons.")
 
-def whisper(text):
-	return text.lower()
+        for item in data_list:
+            try:
+                # Attempt to convert item to a float
+                item_float = float(item) 
+                result = item_float / divisor
+                results.append(result)
+                print(f"Processed {item_float} / {divisor} = {result}")
+            
+            # Specific exception for type conversion errors
+            except ValueError as ve_item: 
+                print(f"Error converting item '{item}' to float: {ve_item}. Skipping.")
+            # Specific exception for division by zero (though we raised a custom one earlier for the divisor itself)
+            # This would catch if item_float was 0 and divisor was something else, leading to 0/non-zero which is fine,
+            # but if we had item_float / 0 and `divisor` was not 0, this would be caught.
+            except ZeroDivisionError: 
+                print(f"Error: Division by zero when processing item '{item}'. Skipping.")
+            # Generic catch for other unexpected errors during item processing
+            except Exception as e_item:
+                print(f"An unexpected error occurred with item '{item}': {e_item}. Skipping.")
+                
+    # Specific exception for type conversion of the divisor
+    except ValueError as ve_divisor:
+        print(f"Error: Invalid divisor '{divisor_str}'. Not a valid number. Details: {ve_divisor}")
+    # Catching any other exceptions related to initial setup or general processing
+    except Exception as e_general:
+        print(f"A general error occurred: {e_general}")
+    
+    # This block executes if the main try block (for divisor setup) completes without raising an exception
+    else:
+        print("All items in the list processed (or skipped due to item-specific errors).")
+        if not results:
+            print("No results were successfully calculated.")
+    
+    # This block always executes, regardless of exceptions in try, except, or else blocks
+    finally:
+        print("Data processing attempt finished.")
+        if results:
+            print(f"Successfully calculated results: {results}")
+        else:
+            print("No results were successfully calculated to display.")
 
-def greet(func):
-	# storing the function in a variable
-	greeting = func("""Hi, I am created by a function passed as an argument.""")
-	print (greeting)
+# Test cases
+print("--- Starting Exception Handling Demo ---")
 
-greet(shout)
-greet(whisper)
+# Valid case
+process_data([10, 20, "30", 40], "2")
 
+# Invalid item in data_list
+process_data([10, "apple", 20], "5")
+
+# Invalid divisor (cannot be converted to float)
+process_data([10, 20], "banana")
+
+# Divisor is zero (custom logical error)
+process_data([10, 20], "0")
+
+# Divisor becomes zero due to float conversion, but our custom check catches it first
+process_data([10, 20], "0.0")
+
+# Empty data list
+process_data([], "5")
 ```
 
 Output:
 ```
+--- Starting Exception Handling Demo ---
+
+--- Processing with divisor: '2' ---
+Processed 10.0 / 2.0 = 5.0
+Processed 20.0 / 2.0 = 10.0
+Processed 30.0 / 2.0 = 15.0
+Processed 40.0 / 2.0 = 20.0
+All items in the list processed (or skipped due to item-specific errors).
+Data processing attempt finished.
+Successfully calculated results: [5.0, 10.0, 15.0, 20.0]
+
+--- Processing with divisor: '5' ---
+Processed 10.0 / 5.0 = 2.0
+Error converting item 'apple' to float: could not convert string to float: 'apple'. Skipping.
+Processed 20.0 / 5.0 = 4.0
+All items in the list processed (or skipped due to item-specific errors).
+Data processing attempt finished.
+Successfully calculated results: [2.0, 4.0]
+
+--- Processing with divisor: 'banana' ---
+Error: Invalid divisor 'banana'. Not a valid number. Details: could not convert string to float: 'banana'
+Data processing attempt finished.
+No results were successfully calculated to display.
+
+--- Processing with divisor: '0' ---
+Error: Invalid divisor '0'. Not a valid number. Details: Divisor cannot be zero for logical reasons.
+Data processing attempt finished.
+No results were successfully calculated to display.
+
+--- Processing with divisor: '0.0' ---
+Error: Invalid divisor '0.0'. Not a valid number. Details: Divisor cannot be zero for logical reasons.
+Data processing attempt finished.
+No results were successfully calculated to display.
+
+--- Processing with divisor: '5' ---
+All items in the list processed (or skipped due to item-specific errors).
+No results were successfully calculated.
+Data processing attempt finished.
+No results were successfully calculated to display.
+```
+This example illustrates:
+*   Nested `try-except` blocks.
+*   Catching specific exceptions (`ValueError`, `ZeroDivisionError`).
+*   Catching general exceptions (`Exception`).
+*   Using `else` to run code when no exceptions occur in the main `try` block.
+*   Using `finally` to run cleanup code regardless of what happened.
+*   Using `raise` to trigger an exception programmatically.
+
+## Function Decorators
+
+Decorators are a very powerful and useful tool in Python that allow programmers to modify the behavior of a function or class without permanently changing its source code. They enable you to wrap another function (the "decorated" function) to extend its functionality, often by adding setup or teardown code.
+
+To understand decorators, it's important to grasp that functions in Python are **first-class objects**.
+
+### First-Class Objects (Functions in Python)
+
+In Python, functions have the following properties, making them first-class objects:
+*   **Instances of Object Type:** A function is an instance of the `Object` type.
+*   **Storable in Variables:** You can assign a function to a variable.
+*   **Passable as Arguments:** You can pass a function as an argument to another function.
+*   **Returnable from Functions:** A function can return another function.
+*   **Storable in Data Structures:** You can store functions in lists, dictionaries, etc.
+
+**Example 1: Storing a function in a variable**
+```python
+# Python program to illustrate functions can be treated as objects
+print("--- Function as an Object Example ---")
+def shout(text):
+    return text.upper()
+
+print(f"Output of shout('Hello'): {shout('Hello')}")
+
+# Assigning the function shout to a variable yell
+yell = shout 
+# Now, yell can be used just like shout
+print(f"Output of yell('Hello'): {yell('Hello')}")
+```
+Output:
+```
+--- Function as an Object Example ---
+Output of shout('Hello'): HELLO
+Output of yell('Hello'): HELLO
+```
+
+**Example 2: Passing a function as an argument**
+```python
+# Python program to illustrate functions can be passed as arguments
+print("\n--- Passing Function as Argument Example ---")
+def shout_text(text):
+    return text.upper()
+
+def whisper_text(text):
+    return text.lower()
+
+def greet_user(modifier_func): # modifier_func is expected to be a function
+    # Call the passed function and store its result
+    message = modifier_func("Hi, I am created by a function passed as an argument.")
+    print(message)
+
+greet_user(shout_text)   # Pass the shout_text function
+greet_user(whisper_text) # Pass the whisper_text function
+```
+Output:
+```
+--- Passing Function as Argument Example ---
 HI, I AM CREATED BY A FUNCTION PASSED AS AN ARGUMENT.
 hi, i am created by a function passed as an argument.
 ```
-In the above example, the greet function takes another function as a parameter (shout and whisper in this case). The function passed as an argument is then called inside the function greet.
+Here, `greet_user` takes another function (`shout_text` or `whisper_text`) as an argument and calls it.
 
-### Example 3: Returning functions from another function.
-
+**Example 3: Returning a function from another function**
 ```python
-# Python program to illustrate functions
-# Functions can return another function
+# Python program to illustrate a function returning another function
+print("\n--- Function Returning Another Function Example ---")
+def create_adder_function(x):
+    """This function creates and returns a new function (adder)."""
+    def adder(y):
+        """This inner function adds x (from outer scope) to y."""
+        return x + y
+    return adder # Return the inner function itself, not its result
 
-def create_adder(x):
-	def adder(y):
-		return x+y
+# Create an "add_15" function:
+# When create_adder_function(15) is called, it returns the 'adder' function,
+# where 'x' is fixed at 15 due to closure.
+add_15 = create_adder_function(15) 
 
-	return adder
-
-add_15 = create_adder(15)
-
-print(add_15(10))
-
+# Now, add_15 is a function that takes one argument (y) and adds 15 to it.
+result = add_15(10) # This calls the inner 'adder' function with y=10 (and x=15)
+print(f"Result of add_15(10): {result}") # Output: 25
 ```
 Output:
 ```
-25
+--- Function Returning Another Function Example ---
+Result of add_15(10): 25
 ```
-In the above example, we have created a function inside of another function and then have returned the function created inside.
-The above three examples depict the important concepts that are needed to understand decorators. After going through them let us now dive deep into decorators.
+The `create_adder_function` returns the `adder` function. This concept of functions remembering their lexical scope (like `x` in `adder`) is called a closure, which is closely related to decorators.
 
-### Decorators
-As stated above the decorators are used to modify the behaviour of function or class. In Decorators, functions are taken as the argument into another function and then called inside the wrapper function.
+### Decorators Explained
 
-Syntax for Decorator: 
+Decorators are functions that take another function as input (the decorated function), add some functionality to it, and then return the modified function (or a new function that wraps the original). This is done without explicitly altering the source code of the decorated function.
 
+**Syntax for Decorators:**
+
+The `@` symbol is used as syntactic sugar for applying a decorator.
+
+```python
+@my_decorator
+def say_hello():
+    print("Hello!")
 ```
-@gfg_decorator
-def hello_decorator():
-    print("Gfg")
 
-'''Above code is equivalent to -
+This is equivalent to:
 
-def hello_decorator():
-    print("Gfg")
+```python
+def say_hello():
+    print("Hello!")
+
+say_hello = my_decorator(say_hello)
+```
+In both cases, `my_decorator` is a function that takes `say_hello` as an argument and returns a new function (or a modified version of `say_hello`). This returned function is then assigned back to the name `say_hello`.
+
+**A Simple Decorator Example:**
+
+Let's create a decorator that adds a welcome message to any function that returns a string.
+
+```python
+# Decorator function
+print("\n--- Basic Decorator Example ---")
+def welcome_decorator(original_function):
+    """
+    This is the decorator function. It takes another function 
+    (original_function) as an argument.
+    """
+    def wrapper_function(*args, **kwargs):
+        """
+        This is the wrapper function. It gets executed when the
+        decorated function is called.
+        It can access arguments passed to the original_function.
+        """
+        print("Wrapper executed before calling", original_function.__name__)
+        # Call the original function and get its result
+        result = original_function(*args, **kwargs) 
+        # Add new behavior
+        return f"Welcome to {result}!" 
     
-hello_decorator = gfg_decorator(hello_decorator)'''
-```
+    # The decorator returns the wrapper function
+    return wrapper_function 
 
-In the above code, gfg_decorator is a callable function, that will add some code on the top of some another callable function, hello_decorator function and return the wrapper function.
+# Applying the decorator using @ syntax
+@welcome_decorator
+def get_website_name(name):
+    """This function returns a website name."""
+    print(f"  Inside get_website_name({name})")
+    return name
 
+# Calling the decorated function
+# This actually calls the 'wrapper_function' returned by 'welcome_decorator'
+output = get_website_name("GeeksforGeeks") 
+print(f"Output after decoration: {output}")
 
-```python3
-# Python program to illustrate functions
-# can be treated as objects
-def shout(text):
-	return text.upper()
+# Without @ syntax (manual decoration)
+def get_another_site(name):
+    print(f"  Inside get_another_site({name})")
+    return name
 
-print(shout('Hello'))
-
-yell = shout
-
-print(yell('Hello'))
-
-```
-
-Output:
-```
-HELLO
-HELLO
-```
-```python
-# A Python program to demonstrate that a function
-# can be defined inside another function and a
-# function can be passed as parameter.
-
-# Adds a welcome message to the string
-def messageWithWelcome(str):
-
-	# Nested function
-	def addWelcome():
-		return "Welcome to "
-
-	# Return concatenation of addWelcome()
-	# and str.
-	return addWelcome() + str
-
-# To get site name to which welcome is added
-def site(site_name):
-	return site_name
-
-print messageWithWelcome(site("GeeksforGeeks"))
-
-```
-A decorator is a function that takes a function as its only parameter and returns a function. This is helpful to “wrap” functionality with the same code over and over again. For example, above code can be re-written as following.
-We use @func_name to specify a decorator to be applied on another function.
-
-```python
-# Adds a welcome message to the string
-# returned by fun(). Takes fun() as
-# parameter and returns welcome().
-def decorate_message(fun):
-
-	# Nested function
-	def addWelcome(site_name):
-		return "Welcome to " + fun(site_name)
-
-	# Decorator returns a function
-	return addWelcome
-
-@decorate_message
-def site(site_name):
-	return site_name;
-
-# Driver code
-
-# This call is equivalent to call to
-# decorate_message() with function
-# site("GeeksforGeeks") as parameter
-print site("GeeksforGeeks")
-
+print("\n--- Manual Decoration Example ---")
+manually_decorated_site = welcome_decorator(get_another_site)
+manual_output = manually_decorated_site("TutorialsPoint")
+print(f"Output from manual decoration: {manual_output}")
 ```
 Output:
 ```
-Welcome to GeeksforGeeks
+--- Basic Decorator Example ---
+Wrapper executed before calling get_website_name
+  Inside get_website_name(GeeksforGeeks)
+Output after decoration: Welcome to GeeksforGeeks!
 
+--- Manual Decoration Example ---
+Wrapper executed before calling get_another_site
+  Inside get_another_site(TutorialsPoint)
+Output from manual decoration: Welcome to TutorialsPoint!
 ```
+**Explanation of the example:**
+1.  `welcome_decorator` is our decorator. It takes `original_function` (which will be `get_website_name`) as an argument.
+2.  Inside `welcome_decorator`, we define `wrapper_function`. This function will eventually replace `get_website_name`.
+    *   `*args` and `**kwargs` in `wrapper_function` ensure it can accept any positional or keyword arguments that the `original_function` might take.
+    *   The wrapper prints a message, calls the `original_function` with its arguments, modifies its result, and returns the modified result.
+3.  `welcome_decorator` returns `wrapper_function`.
+4.  When `@welcome_decorator` is placed above `def get_website_name`, Python effectively does: `get_website_name = welcome_decorator(get_website_name)`.
+5.  So, when `get_website_name("GeeksforGeeks")` is called, it's actually `wrapper_function("GeeksforGeeks")` that executes.
 
-Decorators can also be useful to attach data (or add attribute) to functions.
+**Decorators for Attaching Data (Attributes) to Functions:**
+
+Decorators can also be used to add attributes to functions, although this is less common than behavior modification.
 
 ```python
-# A Python example to demonstrate that
-# decorators can be useful attach data
+# Example: Decorator to attach data to a function
+print("\n--- Decorator for Attaching Data ---")
+def attach_metadata(func_to_decorate):
+    """Decorator to add a 'version' attribute to a function."""
+    func_to_decorate.version = "1.0" # Add an attribute to the function object
+    return func_to_decorate
 
-# A decorator function to attach
-# data to func
-def attach_data(func):
-	func.data = 3
-	return func
+@attach_metadata
+def calculate_sum(x, y):
+    """This function calculates the sum of two numbers."""
+    return x + y
 
-@attach_data
-def add (x, y):
-	return x + y
+# Call the function
+sum_result = calculate_sum(10, 5)
+print(f"Result of calculate_sum(10, 5): {sum_result}")
 
-# Driver code
-
-# This call is equivalent to attach_data()
-# with add() as parameter
-print(add(2, 3))
-
-print(add.data)
+# Access the attribute added by the decorator
+print(f"Version of calculate_sum function: {calculate_sum.version}")
 ```
-
 Output:
 ```
-5
-3
+--- Decorator for Attaching Data ---
+Result of calculate_sum(10, 5): 15
+Version of calculate_sum function: 1.0
 ```
-‘add()’ returns sum of x and y passed as arguments but it is wrapped by a decorator function, calling add(2, 3) would simply give sum of two numbers but when we call add.data then ‘add’ function is passed into then decorator function ‘attach_data’ as argument and this function returns ‘add’ function with an attribute ‘data’ that is set to 3 and hence prints it.
+In this case, `attach_metadata` directly modifies the passed function object by adding an attribute and then returns the same function object.
 
-Python decorators are a powerful tool to remove redundancy.
+Python decorators are a powerful feature for code reuse and separation of concerns, allowing you to add functionality like logging, access control, instrumentation, and more to functions and methods in a clean and readable way.
 
 Date : 01 Aug 2022
 
 __________________
 
-## Regular Expression in Python
-A Regular Expressions (RegEx) is a special sequence of characters that uses a search pattern to find a string or set of strings. It can detect the presence or absence of a text by matching it with a particular pattern, and also can split a pattern into one or more sub-patterns. Python provides a re module that supports the use of regex in Python. Its primary function is to offer a search, where it takes a regular expression and a string. Here, it either returns the first match or else none.
+## Regular Expressions in Python
+
+A **Regular Expression** (often shortened to RegEx or RE) is a special sequence of characters that defines a search pattern. This pattern is used to find, match, or manage specific parts of a string or a set of strings. Regular expressions are incredibly versatile for tasks like data validation, searching, splitting, and replacing text.
+
+Python provides the `re` module to work with regular expressions. The core idea is to define a pattern and then use functions from the `re` module to apply this pattern to a target string.
+
+**Basic Example: Searching for a word**
 
 ```python
-import re
+import re # Import the regular expressions module
 
+# Sample string
 s = 'GeeksforGeeks: A computer science portal for geeks'
 
-match = re.search(r'portal', s)
+# Search for the word 'portal' in the string 's'
+# r'portal' is a raw string. Using 'r' prefix is highly recommended for regex patterns
+# to avoid issues with backslashes being interpreted as escape sequences by Python.
+match_object = re.search(r'portal', s)
 
-print('Start Index:', match.start())
-print('End Index:', match.end())
-
+if match_object: # If a match is found, search() returns a match object
+    print(f"Found '{match_object.group()}'") # .group() returns the matched string
+    print(f"Start Index: {match_object.start()}") # .start() returns the starting index of the match
+    print(f"End Index: {match_object.end()}")     # .end() returns the ending index (exclusive) of the match
+else:
+    print("No match found.")
 ```
-
+Output:
 ```
+Found 'portal'
 Start Index: 34
 End Index: 40
 ```
+In this example, `re.search(r'portal', s)` attempts to find the pattern `portal` within the string `s`. If found, it returns a "match object" containing information about the match; otherwise, it returns `None`.
 
-The above code gives the starting index and the ending index of the string portal. 
+**Raw Strings (`r''`):**
+Notice the `r` before the pattern string (e.g., `r'portal'`). This denotes a **raw string literal**. In raw strings, backslashes (`\`) are treated as literal characters and not as escape characters. This is crucial because regular expressions themselves use backslashes for special meanings (e.g., `\d` for digit), and using raw strings prevents Python from misinterpreting these backslashes before they reach the regex engine.
 
-Note: Here r character (r’portal’) stands for raw, not regex. The raw string is slightly different from a regular string, it won’t interpret the \ character as an escape character. This is because the regular expression engine uses \ character for its own escaping purpose.
+### Metacharacters
 
-### MetaCharacters
+Metacharacters are special characters that have a unique meaning within a regular expression pattern. They are the building blocks for creating powerful search patterns.
 
-To understand the RE analogy, MetaCharacters are useful, important, and will be used in functions of module re. Below is the list of metacharacters.
+| Metacharacter | Description                                                                 | Example Pattern | Sample Matches                    |
+|---------------|-----------------------------------------------------------------------------|-----------------|-----------------------------------|
+| `\`           | **Escape Character:** Escapes the special meaning of a metacharacter, or signals a special sequence. | `\.`            | Matches a literal dot `.`         |
+| `[]`          | **Character Set:** Matches any single character from the set.               | `[aeiou]`       | `a`, `e`, `o` (in "apple")        |
+| `^`           | **Start of String (or Line):** Matches the beginning of the string (or line if `re.MULTILINE` is used). | `^Hello`        | "Hello world"                     |
+| `$`           | **End of String (or Line):** Matches the end of the string (or line if `re.MULTILINE` is used).   | `world$`        | "Hello world"                     |
+| `.`           | **Any Character (except newline):** Matches any single character except `\n`. | `a.b`           | `acb`, `a!b`, `a_b`               |
+| `\|`          | **OR:** Matches either the expression before or after the pipe.             | `cat\|dog`      | "cat", "dog"                      |
+| `?`           | **Zero or One Occurrence:** Matches the preceding element zero or one time.   | `colou?r`       | "color", "colour"                 |
+| `*`           | **Zero or More Occurrences:** Matches the preceding element zero or more times. | `ab*c`          | `ac`, `abc`, `abbbc`              |
+| `+`           | **One or More Occurrences:** Matches the preceding element one or more times.   | `ab+c`          | `abc`, `abbbc` (but not `ac`)     |
+| `{m}`         | **Exactly `m` Occurrences:** Matches exactly `m` occurrences of the preceding element. | `a{3}`          | `aaa`                             |
+| `{m,n}`       | **`m` to `n` Occurrences:** Matches `m` to `n` occurrences of the preceding element. | `a{2,4}`        | `aa`, `aaa`, `aaaa`               |
+| `()`          | **Group:** Groups sub-patterns. Captures the matched text for later use.    | `(a\|b)c`       | `ac`, `bc`                        |
 
-|MetaCharacters|Description|
-|--------------|-----------|
-| \\ | Used to drop special meaning of character following it|
-| [] | Represents a character class|
-| ^ | Matches the beginning |
-| $ | Matches the End |
-| . | Matches any character except new line| 
-| \| | Means OR (Matchess with any of the characters separated by it)|
-| ? | Matches Zero or One Occurence|
-| * | Any number of occurence (Including zero Occurrence)|
-| + | One or more Occurrence|
-| {} | Indicate the number of occurrences of a precdeing regex to match|
-| () | Enclose a group of Regex|
+---
+**Detailed Explanations of Metacharacters:**
 
+#### `\` – Backslash (Escape Character)
+*   **Purpose:** Used to "escape" the special meaning of a metacharacter, treating it as a literal character. It's also used to signal special sequences (like `\d` for digit).
+*   **Example:** To match a literal dot `.` (which normally means "any character"), you use `\.`.
+    ```python
+    import re
+    s = 'geeks.forgeeks'
+    
+    # '.' matches any character (here, 'g')
+    match_any = re.search(r'.', s) 
+    print(f"Search for '.': {match_any}") # Output: <_sre.SRE_Match object; span=(0, 1), match='g'>
+    
+    # '\.' matches the literal dot character
+    match_literal_dot = re.search(r'\.', s)
+    print(f"Search for '\.': {match_literal_dot}") # Output: <_sre.SRE_Match object; span=(5, 6), match='.'>
+    ```
 
+#### `[]` – Character Set (Square Brackets)
+*   **Purpose:** Defines a set of characters, any one of which can match at that position in the string.
+*   **Examples:**
+    *   `[aeiou]` matches any lowercase vowel.
+    *   `[0123456789]` or `[0-9]` matches any digit.
+    *   `[a-zA-Z]` matches any uppercase or lowercase letter.
+    *   `[^0-9]` (with `^` inside `[]`) matches any character that is NOT a digit (negation).
+    *   `[.-]` matches a literal dot or hyphen. Inside a character set, most metacharacters lose their special meaning (e.g., `.` means literal dot, `*` means literal asterisk). However, `^` (at the start for negation), `-` (for ranges), and `\` (for escaping) are still special.
+    ```python
+    import re
+    text = "The quick brown fox jumps over 1 lazy dog."
+    vowels = re.findall(r'[aeiou]', text) # Find all lowercase vowels
+    print(f"Vowels: {vowels}") # Output: ['e', 'u', 'i', 'o', 'o', 'u', 'o', 'e', 'a', 'o']
+    
+    non_digits = re.findall(r'[^0-9]', text) # Find all non-digit characters
+    # print(f"Non-digits: {''.join(non_digits)}") 
+    ```
 
-#### \\ – Backslash
-The backslash (\) makes sure that the character is not treated in a special way. This can be considered a way of escaping metacharacters. For example, if you want to search for the dot(.) in the string then you will find that dot(.) will be treated as a special character as is one of the metacharacters (as shown in the above table). So for this case, we will use the backslash(\) just before the dot(.) so that it will lose its specialty. See the below example for a better understanding.
+#### `^` – Caret (Start of String/Line)
+*   **Purpose:** Matches the beginning of the string. If the `re.MULTILINE` flag is used, it matches the beginning of each line.
+*   **Examples:**
+    *   `^Hello` matches "Hello world" but not "Say Hello".
+    ```python
+    import re
+    print(f"Match '^Geeks': {re.search(r'^Geeks', 'GeeksforGeeks')}") # Matches
+    print(f"Match '^Geeks': {re.search(r'^Geeks', 'A Geeks')}")      # No match
+    ```
 
+#### `$` – Dollar (End of String/Line)
+*   **Purpose:** Matches the end of the string. If the `re.MULTILINE` flag is used, it matches the end of each line (before the newline).
+*   **Examples:**
+    *   `world$` matches "Hello world" but not "world say hello".
+    ```python
+    import re
+    print(f"Match 'geeks$': {re.search(r'geeks$', 'computergeeks')}") # Matches
+    print(f"Match 'geeks$': {re.search(r'geeks$', 'geeks portal')}")  # No match
+    ```
 
-```python
-import re
+#### `.` – Dot (Any Character Except Newline)
+*   **Purpose:** Matches any single character except a newline (`\n`). If the `re.DOTALL` flag is used, it will also match a newline.
+*   **Examples:**
+    *   `a.b` matches `aab`, `axb`, `a!b`, etc.
+    *   `..` matches any two characters (e.g., "hi", "00", "a ").
+    ```python
+    import re
+    print(f"Match 'h.t': {re.search(r'h.t', 'hat')}")  # Matches 'hat'
+    print(f"Match 'h.t': {re.search(r'h.t', 'hot')}")  # Matches 'hot'
+    print(f"Match 'h.t': {re.search(r'h.t', 'ht')}")   # No match (needs a char in between)
+    ```
 
-s = 'geeks.forgeeks'
+#### `|` – OR (Alternation)
+*   **Purpose:** Acts like a boolean OR. Matches the expression before OR the expression after the `|`.
+*   **Examples:**
+    *   `cat|dog` matches "cat" or "dog".
+    *   `^(cat|dog)$` matches "cat" or "dog" as the entire string.
+    ```python
+    import re
+    print(f"Match 'apple|orange': {re.search(r'apple|orange', 'I like apples')}") # Matches 'apple'
+    print(f"Match 'apple|orange': {re.search(r'apple|orange', 'I like oranges')}")# Matches 'orange'
+    ```
 
-# without using \
-match = re.search(r'.', s)
-print(match)
+#### `?` – Question Mark (Zero or One Occurrence)
+*   **Purpose:** Makes the preceding character or group optional (matches it zero or one time).
+*   **Examples:**
+    *   `colou?r` matches "color" (zero 'u's) and "colour" (one 'u').
+    *   `ab?c` matches "ac" or "abc". It will not match "abbc".
+    ```python
+    import re
+    print(f"Match 'honou?r': {re.search(r'honou?r', 'honor')}")  # Matches 'honor'
+    print(f"Match 'honou?r': {re.search(r'honou?r', 'honour')}") # Matches 'honour'
+    ```
 
-# using \
-match = re.search(r'\.', s)
-print(match)
-```
-Output:
-```
-<_sre.SRE_Match object; span=(0, 1), match='g'>
-<_sre.SRE_Match object; span=(5, 6), match='.'>
-```
-#### [] – Square Brackets
+#### `*` – Star (Zero or More Occurrences)
+*   **Purpose:** Matches the preceding character or group zero or more times.
+*   **Examples:**
+    *   `ab*c` matches "ac" (zero 'b's), "abc" (one 'b'), "abbc" (multiple 'b's).
+    *   `.*` matches any sequence of characters (except newlines, unless `re.DOTALL`).
+    ```python
+    import re
+    print(f"Match 'ab*c': {re.search(r'ab*c', 'ac')}")    # Matches 'ac'
+    print(f"Match 'ab*c': {re.search(r'ab*c', 'abc')}")   # Matches 'abc'
+    print(f"Match 'ab*c': {re.search(r'ab*c', 'abbbc')}") # Matches 'abbbc'
+    ```
 
-Square Brackets ([]) represent a character class consisting of a set of characters that we wish to match. For example, the character class [abc] will match any single a, b, or c. 
+#### `+` – Plus (One or More Occurrences)
+*   **Purpose:** Matches the preceding character or group one or more times.
+*   **Examples:**
+    *   `ab+c` matches "abc", "abbc", but NOT "ac" (requires at least one 'b').
+    ```python
+    import re
+    print(f"Match 'ab+c': {re.search(r'ab+c', 'abc')}")   # Matches 'abc'
+    print(f"Match 'ab+c': {re.search(r'ab+c', 'abbbc')}") # Matches 'abbbc'
+    print(f"Match 'ab+c': {re.search(r'ab+c', 'ac')}")    # No match
+    ```
 
-We can also specify a range of characters using – inside the square brackets. For example, 
+#### `{m,n}` – Braces (Specific Number of Occurrences)
+*   **Purpose:** Specifies the number of occurrences for the preceding character or group.
+    *   `{m}`: Exactly `m` occurrences. (e.g., `\d{5}` matches exactly 5 digits).
+    *   `{m,}`: At least `m` occurrences. (e.g., `a{2,}` matches "aa", "aaa", etc.).
+    *   `{m,n}`: Between `m` and `n` occurrences, inclusive. (e.g., `a{2,4}` matches "aa", "aaa", "aaaa").
+    ```python
+    import re
+    print(f"Match 'a{{2,3}}': {re.search(r'a{2,3}', 'aa')}")     # Matches 'aa'
+    print(f"Match 'a{{2,3}}': {re.search(r'a{2,3}', 'aaa')}")    # Matches 'aaa'
+    print(f"Match 'a{{2,3}}': {re.search(r'a{2,3}', 'aaaa')}")   # Matches 'aaa' from 'aaaa'
+    print(f"Match 'a{{2,3}}': {re.search(r'a{2,3}', 'a')}")      # No match
+    ```
 
-* `[0, 3] ` is sample as [0123]
-* `[a-c] ` is same as [abc]
-  
-We can also invert the character class using the caret(^) symbol. For example, 
+#### `()` – Group (Parentheses)
+*   **Purpose:**
+    1.  **Groups sub-patterns:** Allows you to apply quantifiers (like `*`, `+`, `?`, `{}`) to a whole group. E.g., `(ab)+` matches "ab", "abab", "ababab".
+    2.  **Captures matches:** Text matched by a group can be captured for later use (e.g., with `match.group(index)` or backreferences like `\1`).
+*   **Example:**
+    *   `(a|b)c` matches "ac" or "bc". The group `(a|b)` matches "a" or "b".
+    *   `(\d{3})-(\d{3})-(\d{4})` can capture parts of a phone number.
+    ```python
+    import re
+    match = re.search(r'(\w+)-(\d+)', 'item-123')
+    if match:
+        print(f"Full match: {match.group(0)}") # Output: item-123
+        print(f"Group 1: {match.group(1)}")    # Output: item
+        print(f"Group 2: {match.group(2)}")    # Output: 123
+    ```
 
-* `[^0-3] ` means any number except 0, 1, 2, or 3
-* `[^a-c] ` means any character except a, b, or c
-
-ab?c 
-ac 
-acb 
-dabc 
-
-#### \^ – Caret
-Caret (^) symbol matches the beginning of the string i.e. checks whether the string starts with the given character(s) or not. For example –  
-
-* ^g will check if the string starts with g such as geeks, globe, girl, g, etc.
-* ^ge will check if the string starts with ge such as geeks, geeksforgeeks, etc.
-#### \$ – Dollar
-Dollar($) symbol matches the end of the string i.e checks whether the string ends with the given character(s) or not. For example – 
-
-* s$ will check for the string that ends with a such as geeks, ends, s, etc.
-* ks$ will check for the string that ends with ks such as geeks, geeksforgeeks, ks, etc.
-#### \. – Dot
-Dot(.) symbol matches only a single character except for the newline character (\n). For example –  
-
-* a.b will check for the string that contains any character at the place of the dot such as acb, acbd, abbb, etc
-* .. will check if the string contains at least 2 characters
-#### \| – Or
-Or symbol works as the or operator meaning it checks whether the pattern before or after the or symbol is present in the string or not. For example –  
-
-* a|b will match any string that contains a or b such as acd, bcd, abcd, etc.
-#### \? – Question Mark
-Question mark(?) checks if the string before the question mark in the regex occurs at least once or not at all. For example –  
-
-* ab?c will be matched for the string ac, acb, dabc but will not be matched for abbc because there are two b. Similarly, it will not be matched for abdc because b is not followed by c.
-#### – Star
-Star (*) symbol matches zero or more occurrences of the regex preceding the * symbol. For example –  
-
-* ab*c will be matched for the string ac, abc, abbbc, dabc, etc. but will not be matched for abdc because b is not followed by c.
-#### \+ – Plus
-Plus (+) symbol matches one or more occurrences of the regex preceding the + symbol. For example –  
-
-* ab+c will be matched for the string abc, abbc, dabc, but will not be matched for ac, abdc because there is no b in ac and b is not followed by c in abdc.
-
-#### {m, n} – Braces
-Braces match any repetitions preceding regex from m to n both inclusive. For example –  
-
-* a{2, 4} will be matched for the string aaab, baaaac, gaad, but will not be matched for strings like abc, bc because there is only one a or no a in both the cases.
-#### (\<regex\>) – Group
-Group symbol is used to group sub-patterns. For example –  
-
-* (a|b)cd will match for strings like acd, abcd, gacd, etc.
-
+---
 ### Special Sequences
-Special sequences do not match for the actual character in the string instead it tells the specific location in the search string where the match must occur. It makes it easier to write commonly used patterns.
 
+Special sequences start with a backslash `\` followed by a character. They act as shortcuts for commonly used character sets or represent special positions.
 
-|Special Sequence|Description|Examples|
-|----------------|-----------|--------|
-\\A	|Matches if the string begins with the given character	|\Afor 	for geeks `for the world`
-\\b	|Matches if the word begins or ends with the given character. \b(string) will check for the beginning of the word and (string)\b will check for the ending of the word.	|\bge	geeks
-|\B	|It is the opposite of the \b i.e. the string should not start or end with the given regex.	|\Bge	together
-|\d	|Matches any decimal digit, this is equivalent to the set class [0-9]|	\d	123
-|\D	|Matches any non-digit character, this is equivalent to the set class [^0-9]	|\D	geeks
-|\s	|Matches any whitespace character.	|\s	gee ks
-|\S	|Matches any non-whitespace character	|\S	a bd
-|\w	|Matches any alphanumeric character, this is equivalent to the class [a-zA-Z0-9_].	|\w	123
-|\W	|Matches any non-alphanumeric character.	|\W	>$
-|\Z	|Matches if the string ends with the given regex	|ab\Z	abcdab
-### Regex Module in Python
-Python has a module named re that is used for regular expressions in Python. We can import this module by using the import statement.
-#### re.findall()
-Return all non-overlapping matches of pattern in string, as a list of strings. The string is scanned left-to-right, and matches are returned in the order found.
+| Sequence | Description                                        | Equivalent to    | Example Usage                     |
+|----------|----------------------------------------------------|------------------|-----------------------------------|
+| `\A`     | Matches only at the **start** of the string.       | (Similar to `^` but not affected by `re.MULTILINE`) | `\AHello` matches "Hello world"   |
+| `\b`     | **Word Boundary:** Matches the empty string, but only at the beginning or end of a word. A word is a sequence of word characters. |                  | `\bcat\b` matches "cat" in "the cat sat" but not in "catalog". |
+| `\B`     | **Non-Word Boundary:** Matches the empty string, but only when it is NOT at the beginning or end of a word. |                  | `\Bcat\B` matches "cat" in "catalog" but not in "the cat sat". |
+| `\d`     | **Digit:** Matches any decimal digit.              | `[0-9]`          | `\d\d` matches "12"               |
+| `\D`     | **Non-Digit:** Matches any non-digit character.    | `[^0-9]`         | `\D\D` matches "ab"               |
+| `\s`     | **Whitespace:** Matches any whitespace character.  | `[ \t\n\r\f\v]`  | `\s+` matches one or more spaces |
+| `\S`     | **Non-Whitespace:** Matches any non-whitespace character. | `[^ \t\n\r\f\v]` | `\S+` matches words             |
+| `\w`     | **Word Character:** Matches any alphanumeric character (letters, numbers) plus underscore. | `[a-zA-Z0-9_]`   | `\w+` matches "word_123"        |
+| `\W`     | **Non-Word Character:** Matches any character that is not a word character. | `[^a-zA-Z0-9_]`  | `\W` matches "!", "@", " "      |
+| `\Z`     | Matches only at the **end** of the string.         | (Similar to `$` but not affected by `re.MULTILINE` for `\n` at end) | `world\Z` matches "Hello world" |
 
-Example: Finding all occurrences of a pattern 
-
+**Example of `\b` (Word Boundary):**
 ```python
-# A Python program to demonstrate working of
-# findall()
 import re
-
-# A sample text string where regular expression
-# is searched.
-string = """Hello my Number is 123456789 and
-			my friend's number is 987654321"""
-
-# A sample regular expression to find digits.
-regex = '\d+'
-
-match = re.findall(regex, string)
-print(match)
-
-# This example is contributed by Ayush Saluja.
-```
-Output:
-```
-['123456789', '987654321']
-```
-#### re.compile() 
-Regular expressions are compiled into pattern objects, which have methods for various operations such as searching for pattern matches or performing string substitutions. 
-
-```python
-# Module Regular Expression is imported
-# using __import__().
-import re
-
-# compile() creates regular expression
-# character class [a-e],
-# which is equivalent to [abcde].
-# class [abcde] will match with string with
-# 'a', 'b', 'c', 'd', 'e'.
-p = re.compile('[a-e]')
-
-# findall() searches for the Regular Expression
-# and return a list upon finding
-print(p.findall("Aye, said Mr. Gibenson Stark"))
+text = "This is a catalog of cats."
+print(f"Matches for r'cat': {re.findall(r'cat', text)}")             # Output: ['cat', 'cat']
+print(f"Matches for r'\bcat\b': {re.findall(r'\bcat\b', text)}") # Output: ['cat'] (only the whole word)
 ```
 
-Output:
-```
-['e', 'a', 'd', 'b', 'e', 'a']
-```
+---
+### `re` Module Functions
 
-Understanding the Output: 
+Python's `re` module provides several functions to work with regular expressions.
 
-* First occurrence is ‘e’ in “Aye” and not ‘A’, as it is Case Sensitive.
-* Next Occurrence is ‘a’ in “said”, then ‘d’ in “said”, followed by ‘b’ and ‘e’ in “Gibenson”, the Last ‘a’ matches with “Stark”.
-* Metacharacter backslash ‘\’ has a very important role as it signals various sequences. If the backslash is to be used without its special meaning as metacharacter, use’\\’
+#### `re.findall(pattern, string, flags=0)`
+*   **Purpose:** Finds all non-overlapping occurrences of the `pattern` in the `string` and returns them as a list of strings.
+*   **Behavior:**
+    *   The string is scanned from left to right.
+    *   Matches are returned in the order they are found.
+    *   If the pattern includes capturing groups, the list will contain tuples of the captured groups. If there's only one group, the list contains strings of that group's matches. If no groups, the list contains the full pattern matches.
+*   **Syntax:**
+    ```python
+    re.findall(pattern, string, flags=0)
+    ```
+    *   `pattern`: The regular expression to match.
+    *   `string`: The string to search within.
+    *   `flags` (optional): Modifiers like `re.IGNORECASE`, `re.MULTILINE`, `re.DOTALL`.
 
-Example 2: Set class [\s,.] will match any whitespace character,  ‘,’,  or, ‘.’ . 
-
-
+**Example: Finding all digits or words**
 ```python
 import re
 
-# \d is equivalent to [0-9].
-p = re.compile('\d')
-print(p.findall("I went to him at 11 A.M. on 4th July 1886"))
+text = "Hello my Number is 12345 and my friend's number is 98765."
 
-# \d+ will match a group on [0-9], group
-# of one or greater size
-p = re.compile('\d+')
-print(p.findall("I went to him at 11 A.M. on 4th July 1886"))
+# Find all sequences of digits
+digits = re.findall(r'\d+', text) 
+print(f"Digits found: {digits}") # Output: ['12345', '98765']
+
+# Find all sequences of word characters (words)
+words = re.findall(r'\w+', text)
+print(f"Words found: {words}") 
+# Output: ['Hello', 'my', 'Number', 'is', '12345', 'and', 'my', 'friend', 's', 'number', 'is', '98765']
+
+# Example with capturing groups:
+# If the pattern has groups, findall returns a list of tuples (the groups)
+emails = "user1@example.com, user2@test.org"
+# Pattern with two groups: (username)@(domain_part)
+email_parts = re.findall(r'([\w.-]+)@([\w.-]+)', emails)
+print(f"Email parts: {email_parts}") 
+# Output: [('user1', 'example.com'), ('user2', 'test.org')] 
+# If you only want the full email, use a non-capturing group (?:...) or no group for the whole match.
+full_emails = re.findall(r'[\w.-]+@[\w.-]+', emails) # No capturing groups
+print(f"Full emails: {full_emails}")
+# Output: ['user1@example.com', 'user2@test.org']
 ```
 
-Output:
-```
-['1', '1', '4', '1', '8', '8', '6']
-['11', '4', '1886']
-```
+#### `re.compile(pattern, flags=0)`
+*   **Purpose:** Compiles a regular expression pattern into a **pattern object**. This allows the pattern to be reused efficiently without recompiling it each time it's needed.
+*   **Benefit:** If you intend to use the same regex multiple times in your code, compiling it once upfront can improve performance. The resulting pattern object has methods for matching (e.g., `match()`, `search()`, `findall()`) that are equivalent to the `re` module functions.
+*   **Syntax:**
+    ```python
+    re.compile(pattern, flags=0)
+    ```
+    *   `pattern`: The regular expression string.
+    *   `flags` (optional): Same flags as in other `re` functions.
 
-Example 3:
-
+**Example: Using `re.compile()`**
 ```python
 import re
 
-# \w is equivalent to [a-zA-Z0-9_].
-p = re.compile('\w')
-print(p.findall("He said * in some_lang."))
+# Compile a pattern to find words starting with 'c' (case-insensitive)
+# Case-insensitive matching due to re.IGNORECASE
+pattern_obj = re.compile(r'\bc\w*', re.IGNORECASE) 
 
-# \w+ matches to group of alphanumeric character.
-p = re.compile('\w+')
-print(p.findall("I went to him at 11 A.M., he \
-said *** in some_language."))
+text1 = "Cats, dogs, and chickens are common."
+text2 = "A Cute cat."
 
-# \W matches to non alphanumeric characters.
-p = re.compile('\W')
-print(p.findall("he said *** in some_language."))
+# Use the compiled pattern object's findall() method
+print(f"Matches in text1: {pattern_obj.findall(text1)}") # Output: ['Cats', 'chickens', 'common']
+print(f"Matches in text2: {pattern_obj.findall(text2)}") # Output: ['Cute', 'cat']
 
+# Example: Compiling a pattern for digits
+digit_pattern = re.compile(r'\d+')
+print(f"Digits in 'Year 2024, Month 07': {digit_pattern.findall('Year 2024, Month 07')}") # Output: ['2024', '07']
 ```
+**Understanding the Output of `p.findall("Aye, said Mr. Gibenson Stark")` with `p = re.compile('[a-e]')`:**
+*   The pattern `[a-e]` matches any single lowercase character from 'a' through 'e'.
+*   `findall` returns a list of all non-overlapping matches.
+*   "A**ye**, **sa**i**d** Mr. Gi**be**n**s**on St**a**r**k**"
+    *   'e' in "Aye" (Note: 'A' is not matched because the pattern is case-sensitive by default).
+    *   'a' in "said".
+    *   'd' in "said".
+    *   'b' in "Gibenson".
+    *   'e' in "Gibenson".
+    *   'a' in "Stark".
+    Result: `['e', 'a', 'd', 'b', 'e', 'a']`
 
-Output:
-```
-['H', 'e', 's', 'a', 'i', 'd', 'i', 'n', 's', 'o', 'm', 'e', '_', 'l', 'a', 'n', 'g']
-['I', 'went', 'to', 'him', 'at', '11', 'A', 'M', 'he', 'said', 'in', 'some_language']
-[' ', ' ', '*', '*', '*', ' ', ' ', '.']
-```
-Example 4:
-
+**Example: `\w` vs `\w+` vs `\W` with `compile()`**
 ```python
 import re
 
-# '*' replaces the no. of occurrence
-# of a character.
-p = re.compile('ab*')
-print(p.findall("ababbaabbb"))
+# \w matches a single word character (alphanumeric or underscore)
+p_single_w = re.compile(r'\w')
+print(f"Single word chars in 'He said *': {p_single_w.findall('He said * in some_lang.')}")
+# Output: ['H', 'e', 's', 'a', 'i', 'd', 'i', 'n', 's', 'o', 'm', 'e', '_', 'l', 'a', 'n', 'g']
 
+# \w+ matches one or more consecutive word characters (i.e., words)
+p_multi_w = re.compile(r'\w+')
+print(f"Words in 'I went to him...': {p_multi_w.findall('I went to him at 11 A.M., he said *** in some_language.')}")
+# Output: ['I', 'went', 'to', 'him', 'at', '11', 'A', 'M', 'he', 'said', 'in', 'some_language']
+
+# \W matches a single non-word character
+p_non_w = re.compile(r'\W')
+print(f"Non-word chars in 'he said ***': {p_non_w.findall('he said *** in some_language.')}")
+# Output: [' ', ' ', '*', '*', '*', ' ', ' ', '.'] 
 ```
 
-Output:
-```
-['ab', 'abb', 'a', 'abbb']
-```
-##### Understanding the Output: 
-* Our RE is ab*, which ‘a’ accompanied by any no. of ‘b’s, starting from 0.
-* Output ‘ab’, is valid because of single ‘a’ accompanied by single ‘b’.
-* Output ‘abb’, is valid because of single ‘a’ accompanied by 2 ‘b’.
-* Output ‘a’, is valid because of single ‘a’ accompanied by 0 ‘b’.
-* Output ‘abbb’, is valid because of single ‘a’ accompanied by 3 ‘b’.
-#### re.split() 
-
-Split string by the occurrences of a character or a pattern, upon finding that pattern, the remaining characters from the string are returned as part of the resulting list. 
-
-Syntax:
-```
-re.split(pattern, string, maxsplit=0, flags=0)
-```
-
-The First parameter, pattern denotes the regular expression, string is the given string in which pattern will be searched for and in which splitting occurs, maxsplit if not provided is considered to be zero ‘0’, and if any nonzero value is provided, then at most that many splits occur. If maxsplit = 1, then the string will split once only, resulting in a list of length 2. The flags are very useful and can help to shorten code, they are not necessary parameters, eg: flags = re.IGNORECASE, in this split, the case, i.e. the lowercase or the uppercase will be ignored.
-
+**Example: `ab*` with `compile()`**
+The pattern `ab*` means: an 'a', followed by zero or more 'b's.
 ```python
-from re import split
-
-# '\W+' denotes Non-Alphanumeric Characters
-# or group of characters Upon finding ','
-# or whitespace ' ', the split(), splits the
-# string from that point
-print(split('\W+', 'Words, words , Words'))
-print(split('\W+', "Word's words Words"))
-
-# Here ':', ' ' ,',' are not AlphaNumeric thus,
-# the point where splitting occurs
-print(split('\W+', 'On 12th Jan 2016, at 11:02 AM'))
-
-# '\d+' denotes Numeric Characters or group of
-# characters Splitting occurs at '12', '2016',
-# '11', '02' only
-print(split('\d+', 'On 12th Jan 2016, at 11:02 AM'))
-```
-Output:
-```
-['Words', 'words', 'Words']
-['Word', 's', 'words', 'Words']
-['On', '12th', 'Jan', '2016', 'at', '11', '02', 'AM']
-['On ', 'th Jan ', ', at ', ':', ' AM']
+import re
+p_ab_star = re.compile(r'ab*')
+test_string = "ababbaabbb" 
+# Matches:
+# 1. 'ab' at index 0
+# 2. 'abb' at index 2
+# 3. 'a' at index 5 (here 'b*' matches zero 'b's)
+# 4. 'abbb' at index 6
+print(f"Matches for 'ab*' in '{test_string}': {p_ab_star.findall(test_string)}")
+# Output: ['ab', 'abb', 'a', 'abbb']
 ```
 
-Example 2:
+---
+#### `re.split(pattern, string, maxsplit=0, flags=0)`
+*   **Purpose:** Splits the `string` by the occurrences of the `pattern`.
+*   **Behavior:** Returns a list of strings. If capturing parentheses `()` are used in `pattern`, then the text of all groups in the pattern are also returned as part of the resulting list.
+*   **Syntax:**
+    ```python
+    re.split(pattern, string, maxsplit=0, flags=0)
+    ```
+    *   `maxsplit`: If non-zero, at most `maxsplit` splits are performed, and the remainder of the string is returned as the final element of the list. `maxsplit=0` (default) means no limit on splits.
+    *   `flags`: Optional flags like `re.IGNORECASE`.
+
+**Examples:**
+```python
+import re # Use import re once at the top of your script normally
+
+# Splitting by non-alphanumeric characters
+# \W+ matches one or more non-alphanumeric characters (e.g., ',', ' ').
+# The parts of the string *between* these delimiters are returned.
+print(f"Split 'Words, words , Words' by '\\W+': {re.split(r'\W+', 'Words, words , Words')}")
+# Output: ['Words', 'words', 'Words'] 
+
+# Note on "Word's words Words":
+# ' (apostrophe) is a non-alphanumeric character.
+# So, \W+ matches the apostrophe in "Word's", splitting "Word's" into "Word" and "s".
+# It also matches the space.
+print(f"Split 'Word's words Words' by '\\W+': {re.split(r'\W+', "Word's words Words")}")
+# Output: ['Word', 's', 'words', 'Words']
+
+# Splitting a more complex string by non-alphanumeric characters
+print(f"Split 'On 12th Jan 2016, at 11:02 AM' by '\\W+': {re.split(r'\W+', 'On 12th Jan 2016, at 11:02 AM')}")
+# Output: ['On', '12th', 'Jan', '2016', 'at', '11', '02', 'AM']
+
+# Splitting by digits (\d+ matches one or more digits)
+# The parts of the string *between* the digit sequences are returned.
+print(f"Split 'On 12th Jan 2016, at 11:02 AM' by '\\d+': {re.split(r'\d+', 'On 12th Jan 2016, at 11:02 AM')}")
+# Output: ['On ', 'th Jan ', ', at ', ':', ' AM']
+
+# Using maxsplit
+# Splits only at the first occurrence of one or more digits ('12').
+print(f"Split with maxsplit=1: {re.split(r'\d+', 'On 12th Jan 2016, at 11:02 AM', 1)}")
+# Output: ['On ', 'th Jan 2016, at 11:02 AM']
+
+# Using flags (re.IGNORECASE)
+# The pattern [a-f]+ will match both 'a'-'f' and 'A'-'F'.
+text_mixed_case = "Aey, Boy oh Boy, come Here"
+print(f"Split '{text_mixed_case}' by '[a-f]+' (IGNORECASE): {re.split(r'[a-f]+', text_mixed_case, flags=re.IGNORECASE)}")
+# Output: ['', 'y, ', 'oy oh ', 'oy, ', 'om', ' H', 'r', '']
+# Explanation of empty strings in output:
+# - 'A' in 'Aey' is matched by '[a-f]+' (ignorecase). The part *before* 'A' is an empty string.
+# - 'e' in 'Aey' is matched.
+# - 'B' and 'o' in 'Boy' are not matched by '[a-f]+'.
+# - 'o' in 'oh' is not matched.
+# - 'B' and 'o' in 'Boy' are not matched.
+# - 'c', 'o', 'm', 'e' in 'come' are matched.
+# - 'H' in 'Here' is not matched.
+# - 'e', 'r', 'e' in 'Here' are matched. The part *after* the last 'e' (before end of string) is an empty string.
+
+print(f"Split '{text_mixed_case}' by '[a-f]+' (case-sensitive): {re.split(r'[a-f]+', text_mixed_case)}")
+# Output: ['A', 'y, Boy oh ', 'oy, ', 'om', ' H', 'r', ''] 
+# Here 'A', 'B', 'H' are not splitters because they are uppercase.
+```
+
+---
+#### `re.sub(pattern, repl, string, count=0, flags=0)`
+*   **Purpose:** Replaces the leftmost non-overlapping occurrences of `pattern` in `string` with the replacement `repl`.
+*   **Behavior:** If the pattern isn't found, the string is returned unchanged. `repl` can be a string or a function. If `repl` is a string, any backslash escapes in it are processed (e.g., `\n` becomes a newline, `\1` refers to group 1 from the match).
+*   **Syntax:**
+    ```python
+    re.sub(pattern, repl, string, count=0, flags=0)
+    ```
+    *   `pattern`: The regular expression to find.
+    *   `repl`: The string or function to replace the matched pattern with.
+    *   `string`: The string to perform the replacement on.
+    *   `count`: Maximum number of pattern occurrences to replace. `0` (default) means replace all occurrences.
+    *   `flags`: Optional flags like `re.IGNORECASE`.
+
+**Examples:**
 ```python
 import re
 
-# Splitting will occurs only once, at
-# '12', returned list will have length 2
-print(re.split('\d+', 'On 12th Jan 2016, at 11:02 AM', 1))
+# Case-insensitive substitution
+# Replaces 'ub' or 'Ub' with '~*'
+print(f"Sub 'ub' with '~*' (IGNORECASE): {re.sub('ub', '~*', 'Subject has Uber booked already', flags=re.IGNORECASE)}")
+# Output: S~*ject has ~*er booked already
 
-# 'Boy' and 'boy' will be treated same when
-# flags = re.IGNORECASE
-print(re.split('[a-f]+', 'Aey, Boy oh boy, come here', flags=re.IGNORECASE))
-print(re.split('[a-f]+', 'Aey, Boy oh boy, come here'))
+# Case-sensitive substitution
+# Only replaces 'ub', not 'Ub'
+print(f"Sub 'ub' with '~*' (case-sensitive): {re.sub('ub', '~*', 'Subject has Uber booked already')}")
+# Output: S~*ject has Uber booked already
 
-```
-Output:
-```
-['On ', 'th Jan 2016, at 11:02 AM']
-['', 'y, ', 'oy oh ', 'oy, ', 'om', ' h', 'r', '']
-['A', 'y, Boy oh ', 'oy, ', 'om', ' h', 'r', '']
-```
+# Using count to limit replacements
+# Replaces only the first occurrence of 'ub' or 'Ub'
+print(f"Sub 'ub' with '~*' (IGNORECASE, count=1): {re.sub('ub', '~*', 'Subject has Uber booked already', count=1, flags=re.IGNORECASE)}")
+# Output: S~*ject has Uber booked already
 
-#### re.sub()
-
-The ‘sub’ in the function stands for SubString, a certain regular expression pattern is searched in the given string(3rd parameter), and upon finding the substring pattern is replaced by repl(2nd parameter), count checks and maintains the number of times this occurs. 
-
-Syntax:
-```
- re.sub(pattern, repl, string, count=0, flags=0)
-
+# Replacing ' AND ' (with spaces around it) with ' & ', case-insensitive
+# The r'\sAND\s' pattern ensures that 'AND' as a whole word is matched (surrounded by spaces).
+print(f"Sub r'\sAND\s' with ' & ': {re.sub(r'\sAND\s', ' & ', 'Baked Beans And Spam', flags=re.IGNORECASE)}")
+# Output: Baked Beans & Spam
 ```
 
+---
+#### `re.subn(pattern, repl, string, count=0, flags=0)`
+*   **Purpose:** Performs the same function as `re.sub()`, but returns a tuple `(new_string, number_of_subs_made)`.
+*   **Syntax:**
+    ```python
+    re.subn(pattern, repl, string, count=0, flags=0)
+    ```
+
+**Example:**
 ```python
 import re
 
-# Regular Expression pattern 'ub' matches the
-# string at "Subject" and "Uber". As the CASE
-# has been ignored, using Flag, 'ub' should
-# match twice with the string Upon matching,
-# 'ub' is replaced by '~*' in "Subject", and
-# in "Uber", 'Ub' is replaced.
-print(re.sub('ub', '~*', 'Subject has Uber booked already',
-			flags=re.IGNORECASE))
+# Perform substitution and get the count of replacements
+result_tuple = re.subn('ub', '~*', 'Subject has Uber booked already')
+print(f"subn result (case-sensitive): {result_tuple}")
+# Output: ('S~*ject has Uber booked already', 1) 
+# (The new string, number of substitutions)
 
-# Consider the Case Sensitivity, 'Ub' in
-# "Uber", will not be replaced.
-print(re.sub('ub', '~*', 'Subject has Uber booked already'))
+result_tuple_ignorecase = re.subn('ub', '~*', 'Subject has Uber booked already', flags=re.IGNORECASE)
+print(f"subn result (IGNORECASE): {result_tuple_ignorecase}")
+# Output: ('S~*ject has ~*er booked already', 2)
 
-# As count has been given value 1, the maximum
-# times replacement occurs is 1
-print(re.sub('ub', '~*', 'Subject has Uber booked already',
-			count=1, flags=re.IGNORECASE))
-
-# 'r' before the pattern denotes RE, \s is for
-# start and end of a String.
-print(re.sub(r'\sAND\s', ' & ', 'Baked Beans And Spam',
-			flags=re.IGNORECASE))
+# Accessing parts of the tuple
+print(f"The new string: {result_tuple_ignorecase[0]}")
+# Output: S~*ject has ~*er booked already
+print(f"Number of substitutions: {result_tuple_ignorecase[1]}")
+# Output: 2
 ```
 
-Output:
-```
-S~*ject has ~*er booked already
-S~*ject has Uber booked already
-S~*ject has Uber booked already
-Baked Beans & Spam
-```
+---
+#### `re.escape(pattern)`
+*   **Purpose:** Escapes any special characters in the `pattern` string (treats them as literals rather than regex metacharacters). This is useful if you need to dynamically build a regex from a string that might itself contain characters special to regex, and you want to match them literally.
+*   **Syntax:**
+    ```python
+    re.escape(string_to_escape)
+    ```
 
-#### re.subn() 
-
-subn() is similar to sub() in all ways, except in its way of providing output. It returns a tuple with a count of the total of replacement and the new string rather than just the string. 
-
-Syntax:
-```
- re.subn(pattern, repl, string, count=0, flags=0)
-
-```
-
-Example:
+**Example:**
 ```python
 import re
 
-print(re.subn('ub', '~*', 'Subject has Uber booked already'))
+# String with characters that are special in regex (e.g., '.', '[', ']', '*', '+', '?')
+literal_string = "example.com [v1.0*] + (main branch)?"
+escaped_string = re.escape(literal_string)
 
-t = re.subn('ub', '~*', 'Subject has Uber booked already',
-			flags=re.IGNORECASE)
-print(t)
-print(len(t))
+print(f"Original: {literal_string}")
+# Original: example.com [v1.0*] + (main branch)?
 
-# This will give same output as sub() would have
-print(t[0])
+print(f"Escaped: {escaped_string}")
+# Escaped: example\.com\ \[v1\.0\*\]\ \+\ \(main\ branch\)\?
+# Note how '.', '[', ']', '*', '+', '(', ')', '?' are now backslashed.
 
+# Now, escaped_string can be safely used as part of a larger regex pattern
+# if you want to match the literal_string exactly.
+text_to_search = "Please visit example.com [v1.0*] + (main branch)? for details."
+match = re.search(escaped_string, text_to_search)
+print(f"Search result using escaped string: {match}") 
+# Output: <re.Match object; span=(13, 49), match='example.com [v1.0*] + (main branch)?'>
 ```
 
-#### re.escape()
+---
+#### `re.search(pattern, string, flags=0)`
+*   **Purpose:** Scans through `string` looking for the **first location** where the `pattern` produces a match.
+*   **Behavior:** Returns a **match object** if a match is found anywhere in the string, otherwise returns `None`. It stops after the first match, making it suitable for checking if a pattern exists or for finding its first occurrence.
+*   **Syntax:**
+    ```python
+    re.search(pattern, string, flags=0)
+    ```
 
-Returns string with all non-alphanumerics backslashed, this is useful if you want to match an arbitrary literal string that may have regular expression metacharacters in it.
-
-Syntax:
-```
-re.escape(string)
-```
-
-
+**Example:**
 ```python
 import re
 
-# escape() returns a string with BackSlash '\',
-# before every Non-Alphanumeric Character
-# In 1st case only ' ', is not alphanumeric
-# In 2nd case, ' ', caret '^', '-', '[]', '\'
-# are not alphanumeric
-print(re.escape("This is Awesome even 1 AM"))
-print(re.escape("I Asked what is this [a-9], he said \t ^WoW"))
-```
+text = "I was born on June 24, 1990. My friend was born on July 10."
+# Pattern to match a month name followed by a day number.
+# Parentheses create capturing groups for the month and day.
+pattern = r"([a-zA-Z]+) (\d+)" 
 
-Output:
-```
-This\ is\ Awesome\ even\ 1\ AM
-I\ Asked\ what\ is\ this\ \[a\-9\]\,\ he\ said\ \    \ \^WoW
-```
+match_obj = re.search(pattern, text) # Search for the pattern in the text
 
-#### re.search()
-```python
-# A Python program to demonstrate working of re.match().
-import re
-
-# Lets use a regular expression to match a date string
-# in the form of Month name followed by day number
-regex = r"([a-zA-Z]+) (\d+)"
-
-match = re.search(regex, "I was born on June 24")
-
-if match != None:
-
-	# We reach here when the expression "([a-zA-Z]+) (\d+)"
-	# matches the date string.
-
-	# This will print [14, 21), since it matches at index 14
-	# and ends at 21.
-	print ("Match at index %s, %s" % (match.start(), match.end()))
-
-	# We us group() method to get all the matches and
-	# captured groups. The groups contain the matched values.
-	# In particular:
-	# match.group(0) always returns the fully matched string
-	# match.group(1) match.group(2), ... return the capture
-	# groups in order from left to right in the input string
-	# match.group() is equivalent to match.group(0)
-
-	# So this will print "June 24"
-	print ("Full match: %s" % (match.group(0)))
-
-	# So this will print "June"
-	print ("Month: %s" % (match.group(1)))
-
-	# So this will print "24"
-	print ("Day: %s" % (match.group(2)))
-
+if match_obj:
+    print(f"First match found: '{match_obj.group(0)}'") # group(0) is the entire match
+    print(f"  Month (Group 1): '{match_obj.group(1)}'") # Month captured by the first parentheses
+    print(f"  Day (Group 2): '{match_obj.group(2)}'")   # Day captured by the second parentheses
+    print(f"  Start index of match: {match_obj.start()}, End index: {match_obj.end()}")
 else:
-	print ("The regex pattern does not match.")
+    print("No match found.")
 ```
-
 Output:
 ```
-Match at index 14, 21
-Full match: June 24
-Month: June
-Day: 24
+First match found: 'June 24'
+  Month (Group 1): 'June'
+  Day (Group 2): '24'
+  Start index of match: 14, End index: 21
 ```
+Even though "July 10" also matches the pattern, `re.search()` stops after finding "June 24".
+
+---
 ### Match Object
-A Match object contains all the information about the search and the result and if there is no match found then None will be returned. Let’s see some of the commonly used methods and attributes of the match object.
+A Match object contains all the information about the search and the result. If no match is found, functions like `re.search()` and `re.match()` return `None`.
 
-#### Getting the string and the regex
-match.re attribute returns the regular expression passed and match.string attribute returns the string passed.
+Key methods and attributes of a Match Object:
 
-Example: Getting the string and the regex of the matched object
+#### `match.group([group1, ...])`
+*   **Purpose:** Returns the part of the string where the match occurred.
+*   **Arguments:**
+    *   `group(0)` or `group()`: Returns the entire matched substring. This is the default if no argument is given.
+    *   `group(N)`: Returns the substring matched by the Nth capturing group `()` in the pattern (1-indexed).
+    *   `group('name')`: Returns the substring matched by a named capturing group `(?P<name>...)`.
+    *   `group(group1, group2, ...)`: Returns a tuple containing the strings for the specified groups.
 
 ```python
 import re
+text = "User: john_doe, ID: 12345, Role: admin"
+# Using named groups: ?P<username> and ?P<userid>
+match = re.search(r"User: (?P<username>\w+), ID: (?P<userid>\d+)", text)
+if match:
+    print(f"Full match (group 0): {match.group(0)}") 
+    # Output: User: john_doe, ID: 12345
+    print(f"Username (group 'username'): {match.group('username')}") # Access by name
+    # Output: john_doe
+    print(f"ID (group 2): {match.group(2)}") # Access by index (userid is the 2nd group)
+    # Output: 12345
+    print(f"Tuple of all captured groups: {match.groups()}") 
+    # Output: ('john_doe', '12345')
+```
 
+#### `match.start([group])`
+*   **Purpose:** Returns the starting index (inclusive) of the substring matched by `group`.
+*   `group` defaults to 0 (the entire match).
+
+#### `match.end([group])`
+*   **Purpose:** Returns the ending index (exclusive) of the substring matched by `group`.
+*   `group` defaults to 0 (the entire match).
+
+#### `match.span([group])`
+*   **Purpose:** Returns a tuple `(start_index, end_index)` of the substring matched by `group`.
+*   `group` defaults to 0 (the entire match).
+
+```python
+import re
 s = "Welcome to GeeksForGeeks"
+# Search for a word starting with 'G' followed by 'ee', and capture the whole word.
+match_obj = re.search(r"(\bGee\w*)", s) # \b ensures word boundary, parentheses for group 1
 
-# here x is the match object
-res = re.search(r"\bG", s)
+if match_obj:
+    print(f"Matched substring (group 0): '{match_obj.group(0)}'") # 'GeeksForGeeks'
+    print(f"Start index (group 0): {match_obj.start(0)}")         # 11
+    print(f"End index (group 0): {match_obj.end(0)}")           # 24
+    print(f"Span (group 0): {match_obj.span(0)}")              # (11, 24)
 
-print(res.re)
-print(res.string)
+    # Since we have a capturing group (the whole word)
+    print(f"\nMatched substring (group 1): '{match_obj.group(1)}'") # 'GeeksForGeeks'
+    print(f"Start index (group 1): {match_obj.start(1)}")         # 11
+    print(f"End index (group 1): {match_obj.end(1)}")           # 24
+    print(f"Span (group 1): {match_obj.span(1)}")              # (11, 24)
 ```
 
-```
-re.compile('\\bG')
-Welcome to GeeksForGeeks
-```
-####
-* start() method returns the starting index of the matched substring
-* end() method returns the ending index of the matched substring
-* span() method returns a tuple containing the starting and the ending index of the matched substring
+#### `match.re`
+*   **Purpose:** The regular expression object (the compiled pattern) whose `match()` or `search()` method produced this instance.
+
+#### `match.string`
+*   **Purpose:** The string passed to `match()` or `search()`.
 
 ```python
 import re
+pattern_str = r"\b\w{4}\b" # Pattern for exactly four-letter words
+text_str = "This is a test sentence."
+compiled_pattern = re.compile(pattern_str)
+match_instance = compiled_pattern.search(text_str) # Search for 'This'
 
-s = "Welcome to GeeksForGeeks"
-
-# here x is the match object
-res = re.search(r"\bGee", s)
-
-print(res.start())
-print(res.end())
-print(res.span())
+if match_instance:
+    print(f"\n--- Match Object Attributes ---")
+    print(f"Matched string: '{match_instance.group()}'") 
+    # Output: 'This'
+    print(f"Regex object used: {match_instance.re}")        
+    # Output: re.compile('\\b\\w{4}\\b')
+    print(f"Original string searched: '{match_instance.string}'") 
+    # Output: 'This is a test sentence.'
 ```
 
-Output:
-```
-11
-14
-(11, 14)
-```
+---
+#### `re.match(pattern, string, flags=0)`
+*   **Purpose:** Tries to match the `pattern` at the **beginning** of the `string` only.
+*   **Behavior:** If zero or more characters at the beginning of `string` match the `pattern`, returns a corresponding match object. Returns `None` if the string does not start with the pattern. This is different from `re.search()`, which scans the entire string.
+*   **Syntax:**
+    ```python
+    re.match(pattern, string, flags=0)
+    ```
 
-#### Getting matched substring
-group() method returns the part of the string for which the patterns match. See the below example for a better understanding.
-
-Example: Getting matched substring 
-
+**Example: `re.match()` vs `re.search()`**
 ```python
 import re
+text = "Chapter 2: The Beginning"
 
-s = "Welcome to GeeksForGeeks"
-
-# here x is the match object
-res = re.search(r"\D{2} t", s)
-
-print(res.group())
-```
-Output:
-```
-me t
-```
-In the above example, our pattern specifies for the string that contains at least 2 characters which are followed by a space, and that space is followed by a t. 
-
-
-
-## Regular Expressions in Python – Set 2 (Search, Match and Find All)
-
-re.search() : This method either returns None (if the pattern doesn’t match), or a re.MatchObject that contains information about the matching part of the string. This method stops after the first match, so this is best suited for testing a regular expression more than extracting data.
-
-```python
-# A Python program to demonstrate working of re.match().
-import re
-
-# Lets use a regular expression to match a date string
-# in the form of Month name followed by day number
-regex = r"([a-zA-Z]+) (\d+)"
-
-match = re.search(regex, "I was born on June 24")
-
-if match != None:
-
-	# We reach here when the expression "([a-zA-Z]+) (\d+)"
-	# matches the date string.
-
-	# This will print [14, 21), since it matches at index 14
-	# and ends at 21.
-	print ("Match at index %s, %s" % (match.start(), match.end()))
-
-	# We us group() method to get all the matches and
-	# captured groups. The groups contain the matched values.
-	# In particular:
-	# match.group(0) always returns the fully matched string
-	# match.group(1) match.group(2), ... return the capture
-	# groups in order from left to right in the input string
-	# match.group() is equivalent to match.group(0)
-
-	# So this will print "June 24"
-	print ("Full match: %s" % (match.group(0)))
-
-	# So this will print "June"
-	print ("Month: %s" % (match.group(1)))
-
-	# So this will print "24"
-	print ("Day: %s" % (match.group(2)))
-
+# Using re.match() - only matches if the pattern is at the START of the string
+match_at_start = re.match(r"Chapter \d+", text)
+if match_at_start:
+    print(f"re.match() for 'Chapter \\d+' found: '{match_at_start.group()}'") 
+    # Output: 'Chapter 2'
 else:
-	print ("The regex pattern does not match.")
+    print("re.match() for 'Chapter \\d+' found nothing.")
 
+# This pattern is not at the start of 'text', so re.match() will fail.
+match_middle_pattern = re.match(r"The Beginning", text) 
+if match_middle_pattern:
+    print(f"re.match() for 'The Beginning' found: '{match_middle_pattern.group()}'")
+else:
+    print("re.match() for 'The Beginning' found nothing.") 
+    # Output: re.match() for 'The Beginning' found nothing.
+
+# Using re.search() - scans the whole string for the first match
+search_for_middle = re.search(r"The Beginning", text)
+if search_for_middle:
+    print(f"re.search() for 'The Beginning' found: '{search_for_middle.group()}'") 
+    # Output: 'The Beginning'
+else:
+    print("re.search() for 'The Beginning' found nothing.")
 ```
 
-Output:
-```
-Match at index 14, 21
-Full match: June 24
-Month: June
-Day: 24 
-```
+---
+*The section "Regular Expressions in Python – Set 2 (Search, Match and Find All)" is largely redundant as its content has been integrated into the detailed explanations of `re.search()`, `re.match()`, and `re.findall()` above for better organization and clarity.*
 
-#### Matching a Pattern with Text 
-
-re.match() : This function attempts to match pattern to whole string. The re.match function returns a match object on success, None on failure.
-
-```
-re.match(pattern, string, flags=0)
-
-pattern : Regular expression to be matched.
-string : String where pattern is searched
-flags : We can specify different flags 
-        using bitwise OR (|).
-```
-
+Final example: Extracting email addresses:
 ```python
-# A Python program to demonstrate working
-# of re.match().
-import re
-	
-# a sample function that uses regular expressions
-# to find month and day of a date.
-def findMonthAndDate(string):
-		
-	regex = r"([a-zA-Z]+) (\d+)"
-	match = re.match(regex, string)
-		
-	if match == None:
-		print ("Not a valid date")
-		return
-	
-	print ("Given Data: %s" % (match.group()))
-	print ("Month: %s" % (match.group(1)))
-	print ("Day: %s" % (match.group(2)))
-	
-		
-# Driver Code
-findMonthAndDate("Jun 24")
-print("")
-findMonthAndDate("I was born on June 24")
+# Example: Extracting email addresses
+print("\n--- Email Extraction Example ---")
+text_with_emails = "Contact us at info@example.com or support@another.org for help. Test User <test.user@internal.example.co.uk>"
+# A common (though not exhaustive for all valid RFC 5322 emails) regex for emails:
+email_regex = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
 
-```
+extracted_emails = re.findall(email_regex, text_with_emails)
+print(f"Extracted emails: {extracted_emails}")
+# Output: ['info@example.com', 'support@another.org', 'test.user@internal.example.co.uk']
 
-Output:
-```
-Given Data: Jun 24
-Month: Jun
-Day: 24
-
-Not a valid date
-```
-
-#### Finding all occurrences of a pattern 
-
-re.findall() : Return all non-overlapping matches of pattern in string, as a list of strings. The string is scanned left-to-right, and matches are returned in the order found (Source : Python Docs). 
-
-```python
-# A Python program to demonstrate working of
-# findall()
-import re
-
-# A sample text string where regular expression
-# is searched.
-string = """Hello my Number is 123456789 and
-			my friend's number is 987654321"""
-
-# A sample regular expression to find digits.
-regex = '\d+'			
-
-match = re.findall(regex, string)
-print(match)
-
-# This example is contributed by Ayush Saluja.
-
-```
-
-Output:
-```
-['123456789', '987654321']
-```
-
-#### Regex to extract email address from a text
-
-```
-# extract all email addresses and add them into the resulting set
-new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", 
-                           text, re.I))
+# To make findall case-insensitive (though the pattern itself is mostly case-insensitive already for emails):
+extracted_emails_ignorecase = re.findall(email_regex, text_with_emails, re.IGNORECASE)
+print(f"Extracted emails (ignorecase): {extracted_emails_ignorecase}")
+# Output: ['info@example.com', 'support@another.org', 'test.user@internal.example.co.uk']
 ```

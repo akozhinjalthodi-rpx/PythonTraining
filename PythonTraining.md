@@ -13,11 +13,11 @@ Python is an interpreted, Object Oriented, High Level programming language with 
 ### Download and install Latest Version from https://www.python.org/downloads/
 
 
-## Python OOPs Concepts
+## Python OOP Concepts
 
-In Python object oriented programming (OOOPs) is a programming paradigm that uses objects and classes in programming. It aims to implement real world entities like inheritaince, polymorphisms,encapsulations, etc. in the programming. The main concept if OOPs is to bind the data and the functions that work on that together as a single unit so that no other part of the code can access this data.
+Object-Oriented Programming (OOP) in Python is a programming paradigm based on the concept of "objects", which can contain data in the form of fields (often known as attributes or properties) and code in the form of procedures (often known as methods). It aims to implement real-world entities like inheritance, polymorphism, encapsulation, etc., in programming. The core principle of OOP is to bind data and the functions that operate on that data together as a single unit, restricting access to this data from other parts of the code.
 
-### Main Concepts of Object Oriented Programming (OOPs)
+### Main Concepts of Object-Oriented Programming (OOP)
     * Class 
     * Objects
     * Polymorphism
@@ -59,11 +59,13 @@ An Object is an entity that has a state and behaviour associated with it.
 obj = Dog()
 ```
 
-##### The self :
-* Class methods must have an extra parameter in the method definition. We don't need to give value for this parameter when we call a method (Python prvides it).
-* If we have a method that takes no argument, we still have to have one argument.
+##### The `self` Parameter:
+* In Python, instance methods (methods belonging to an object) must have `self` as their first parameter in the method definition. 
+* When you call an instance method like `my_object.method(arg1, arg2)`, Python automatically passes the object `my_object` as the first argument to `self`. So, the call effectively becomes `ClassName.method(my_object, arg1, arg2)`.
+* You do not explicitly pass a value for `self` when calling the method.
+* Even if a method takes no other arguments, it must still include `self` as its first parameter. For example: `def my_method(self):`.
 
-When we call a method of an object for eg: myobject.method(arg1,arg2) is automatically converted by python into myobject.method(myobject,arg1,arg2)
+This `self` parameter provides a reference to the instance of the class, allowing you to access its attributes and other methods from within the instance method.
 
 ##### The `__init__` method :
 
@@ -131,13 +133,15 @@ My name is Rodger
 My name is Tommy
 ```
 #### Inheritance
-Inheritance is the property of one class to derive or inherit the properties from another class. The class that derives properties is called derived class or child class and the class from which the properties are being derived is called the base class or parent class.
+Inheritance is a fundamental concept in OOP where a class (known as a child or derived class) acquires the properties and behaviors (methods) of another class (known as a parent or base class).
 
-##### Benifits
-* It represents real-world relationships well 
-* It provides reusability of code 
-* It is transitive in nature, meaning if class B inherit from another class A, then all the subclasses of B would automatically inherit from class A
-##### Example : Inheritance in Python
+##### Benefits of Inheritance
+*   **Code Reusability:** Inheritance allows child classes to reuse code from parent classes, reducing redundancy and making code easier to maintain.
+*   **Real-world Modeling:** It effectively models real-world "is-a" relationships (e.g., a `Car` is a `Vehicle`).
+*   **Extensibility:** New features can be added to a child class without modifying the parent class.
+*   **Transitivity:** If class `B` inherits from class `A`, and class `C` inherits from class `B`, then class `C` also inherits from class `A`. This allows for creating a hierarchy of classes.
+
+##### Example: Inheritance in Python
 ```python
 # Python code to demonstrate how parent constructors
 # are called.
@@ -252,9 +256,10 @@ Wrapping data and methods that work on data within one unit.This puts restrictio
 ##### Protected Members
 * Members of class which cannot be accessed outside the class.
 * It can be accessed by members of the class or its subclass
-* Single _ is used to define a protected variable/member
+* Single underscore `_` prefix is used by convention to indicate that a member (attribute or method) is "protected".
 
-Note : Although the protected variable can be accessed out of the class as well as in the derived class(modified too in derived class), it is customary(convention not a rule) to not access the protected out the class body.
+**Note on Protected Members:**
+Protected members are intended for internal use by the class and its subclasses. While Python does not strictly enforce access control for protected members (they can still be accessed from outside the class), the underscore prefix serves as a strong convention signaling that these members should not be accessed directly from outside the class or by unrelated classes. It's a way to indicate that the member is part of the internal implementation and might change without notice.
 
 ```python
 # Python program to
@@ -842,239 +847,690 @@ cse
 cse
 ```
 
-## Types of inheritance Python
-Inheritance is defined as the mechanism of inheriting the properties of the base class to the child class.
+## Types of Inheritance in Python
+Inheritance is defined as the mechanism of inheriting the properties of the base class to the child class. Python supports several types of inheritance:
 
-### Types of Inheritaince
-* Single Inheritance
-* Multiple Inheritance
-* Multilevel Inheritance
-* Hierarchical Inheritance
-* Hybrid Inheritance
+*   **Single Inheritance:** A derived class inherits from a single parent class.
+*   **Multiple Inheritance:** A derived class inherits from more than one parent class.
+*   **Multilevel Inheritance:** A derived class inherits from a parent class, which in turn inherits from another parent class (e.g., `A -> B -> C`).
+*   **Hierarchical Inheritance:** Multiple derived classes inherit from a single parent class (e.g., `B -> A`, `C -> A`).
+*   **Hybrid Inheritance:** A combination of two or more types of inheritance.
 
-#### Single Inheritaince
-Single inheritance enables a derived class to inherit properties from a single parent class, thus enabling code reusability and the addition of new features to existing code.
+#### Single Inheritance
+Single inheritance enables a derived class to inherit properties and methods from a single parent class, promoting code reusability and allowing for the extension of existing code.
 
 ```python
-#Python program to demonstrate single inhertaince 
+# Python program to demonstrate single inheritance 
 
 # Base Class
 class Parent:
-	def func1(self):
-		print("This function is in Parent class")
+    def func1(self):
+        print("This function is in the Parent class.") # Added clarity to the print statement
 	
 # Derived Class 
-
-class Child(Parent):
-	def func2(self):
-		print("This function is in child class")
+class Child(Parent): # Child class inherits from Parent class
+    def func2(self):
+        print("This function is in the Child class.") # Added clarity to the print statement
 
 # Driver's code
-object=Child()
-object.func1()
-object.func2()
+obj = Child() # Create an object of the Child class
+obj.func1()   # Call func1 from the Parent class (inherited by Child)
+obj.func2()   # Call func2 from the Child class
 ```
 
 Output:
 
 ```
-This function is in parent class.
-This function is in child class.
+This function is in the Parent class.
+This function is in the Child class.
 ```
 
-#### Multiple Inheritaince
-When a class can be derived from more than one base class this type of inheritance is called multiple inheritances. In multiple inheritances, all the features of the base classes are inherited into the derived class
+#### Multiple Inheritance
+When a class is derived from more than one base class, it's called multiple inheritance. The derived class inherits all the features (attributes and methods) of all its parent classes.
 
 ```python
-# Python program to demonstrate
-# multiple inheritance
+# Python program to demonstrate multiple inheritance
 
-# Base class1
+# Base class 1
 class Mother:
-	mothername = ""
+    mothername = "" # Class attribute for mother's name
 
-	def mother(self):
-		print(self.mothername)
+    def mother_info(self): # Renamed for clarity
+        print(f"Mother's name: {self.mothername}")
 
-# Base class2
-
-
+# Base class 2
 class Father:
-	fathername = ""
+    fathername = "" # Class attribute for father's name
 
-	def father(self):
-		print(self.fathername)
+    def father_info(self): # Renamed for clarity
+        print(f"Father's name: {self.fathername}")
 
-# Derived class
-
-
+# Derived class inheriting from Mother and Father
 class Son(Mother, Father):
-	def parents(self):
-		print("Father :", self.fathername)
-		print("Mother :", self.mothername)
-
+    def display_parents_info(self): # Renamed for clarity
+        # Accessing attributes and methods from both parent classes
+        print(f"Father: {self.fathername}") 
+        print(f"Mother: {self.mothername}")
+        # You can also call parent methods directly if needed:
+        # self.father_info()
+        # self.mother_info()
 
 # Driver's code
 s1 = Son()
-s1.fathername = "RAM"
-s1.mothername = "SITA"
-s1.parents()
-
+s1.fathername = "RAM"   # Set father's name
+s1.mothername = "SITA"  # Set mother's name
+s1.display_parents_info() # Call method of Son class
 ```
 
 Output:
 ```
-Father : RAM
-Mother : SITA
+Father: RAM
+Mother: SITA
 ```
 
-#### Multilevel Inheritance :
-In multilevel inheritance, features of the base class and the derived class are further inherited into the new derived class. This is similar to a relationship representing a child and a grandfather. 
+#### Multilevel Inheritance
+In multilevel inheritance, a derived class inherits from a base class, which in turn inherits from another base class. This creates a "chain" of inheritance.
 
 ```python
-# Python program to demonstrate
-# multilevel inheritance
+# Python program to demonstrate multilevel inheritance
 
-# Base class
-
-
+# Base class (Grandparent)
 class Grandfather:
+    def __init__(self, grandfathername):
+        self.grandfathername = grandfathername
 
-	def __init__(self, grandfathername):
-		self.grandfathername = grandfathername
-
-# Intermediate class
-
-
+# Intermediate class (Parent, inherits from Grandfather)
 class Father(Grandfather):
-	def __init__(self, fathername, grandfathername):
-		self.fathername = fathername
+    def __init__(self, fathername, grandfathername):
+        self.fathername = fathername
+        # Invoking constructor of Grandfather class
+        Grandfather.__init__(self, grandfathername)
 
-		# invoking constructor of Grandfather class
-		Grandfather.__init__(self, grandfathername)
-
-# Derived class
-
-
+# Derived class (Child, inherits from Father)
 class Son(Father):
-	def __init__(self, sonname, fathername, grandfathername):
-		self.sonname = sonname
+    def __init__(self, sonname, fathername, grandfathername):
+        self.sonname = sonname
+        # Invoking constructor of Father class
+        Father.__init__(self, fathername, grandfathername)
 
-		# invoking constructor of Father class
-		Father.__init__(self, fathername, grandfathername)
-
-	def print_name(self):
-		print('Grandfather name :', self.grandfathername)
-		print("Father name :", self.fathername)
-		print("Son name :", self.sonname)
-
+    def print_family_names(self): # Renamed for clarity
+        print(f'Grandfather name: {self.grandfathername}')
+        print(f"Father name: {self.fathername}")
+        print(f"Son name: {self.sonname}")
 
 # Driver code
 s1 = Son('Prince', 'Rampal', 'Lal mani')
-print(s1.grandfathername)
-s1.print_name()
-
+print(f"Accessing grandfather's name directly: {s1.grandfathername}") # Accessing attribute from Grandfather class
+s1.print_family_names() # Calling method of Son class
 ```
 
 Output:
 ```
-Lal mani
-Grandfather name : Lal mani
-Father name : Rampal
-Son name : Prince
+Accessing grandfather's name directly: Lal mani
+Grandfather name: Lal mani
+Father name: Rampal
+Son name: Prince
 ```
 
-#### Hierarichical Inheritaince
+#### Hierarchical Inheritance
+When more than one derived class inherits from a single base class, it's called hierarchical inheritance. This allows multiple specialized classes to share common functionality from a single parent.
 
-When more than one derived class are created from a single base this type of inheritance is called hierarchical inheritance. In this program, we have a parent (base) class and two child (derived) classes.
-
-```python3
-# Python program to demonstrate
-# Hierarchical inheritance
-
+```python
+# Python program to demonstrate Hierarchical inheritance
 
 # Base class
 class Parent:
-	def func1(self):
-		print("This function is in parent class.")
+    def common_function(self): # Renamed for clarity
+        print("This function is in the Parent class.")
 
-# Derived class1
-
-
+# Derived class 1 (inherits from Parent)
 class Child1(Parent):
-	def func2(self):
-		print("This function is in child 1.")
+    def child1_function(self): # Renamed for clarity
+        print("This function is in Child 1.")
 
-# Derivied class2
-
-
+# Derived class 2 (inherits from Parent)
 class Child2(Parent):
-	def func3(self):
-		print("This function is in child 2.")
-
+    def child2_function(self): # Renamed for clarity
+        print("This function is in Child 2.")
 
 # Driver's code
 object1 = Child1()
 object2 = Child2()
-object1.func1()
-object1.func2()
-object2.func1()
-object2.func3()
+
+object1.common_function() # Calling method from Parent class via Child1 object
+object1.child1_function() # Calling method from Child1 class
+
+object2.common_function() # Calling method from Parent class via Child2 object
+object2.child2_function() # Calling method from Child2 class
 ```
 
 Output:
 
 ```
-This function is in parent class.
-This function is in child 1.
-This function is in parent class.
-This function is in child 2.
+This function is in the Parent class.
+This function is in Child 1.
+This function is in the Parent class.
+This function is in Child 2.
 ```
 
-#### Hybrid Inheritance: 
-Inheritance consisting of multiple types of inheritance is called hybrid inheritance.
+#### Hybrid Inheritance
+Hybrid inheritance is a combination of two or more types of inheritance. For example, it might involve a mix of multilevel and multiple inheritance.
 
 ```python
-# Python program to demonstrate
-# hybrid inheritance
+# Python program to demonstrate hybrid inheritance
 
+class SchoolFaculty: # A base class
+    def faculty_info(self):
+        print("This function is in SchoolFaculty.")
 
-class School:
-	def func1(self):
-		print("This function is in school.")
+class Student(SchoolFaculty): # Derived from SchoolFaculty (Single Inheritance)
+    def student_info(self):
+        print("This function is in Student.")
 
+class Teacher(SchoolFaculty): # Also derived from SchoolFaculty (Hierarchical with Student)
+    def teacher_info(self):
+        print("This function is in Teacher.")
 
-class Student1(School):
-	def func2(self):
-		print("This function is in student 1. ")
-
-
-class Student2(School):
-	def func3(self):
-		print("This function is in student 2.")
-
-
-class Student3(Student1, School):
-	def func4(self):
-		print("This function is in student 3.")
-
+# TeachingAssistant inherits from Student and Teacher (Multiple Inheritance)
+# This creates a hybrid inheritance structure (specifically a "diamond" shape if Student and Teacher
+# were to inherit from a common grandparent of SchoolFaculty, but here it's simpler).
+class TeachingAssistant(Student, Teacher): 
+    def ta_info(self):
+        print("This function is in TeachingAssistant.")
 
 # Driver's code
-object = Student3()
-object.func1()
-object.func2()
+ta_object = TeachingAssistant()
+ta_object.faculty_info()    # From SchoolFaculty (via Student or Teacher due to MRO)
+ta_object.student_info()    # From Student
+ta_object.teacher_info()    # From Teacher
+ta_object.ta_info()         # From TeachingAssistant
 
+# Example of MRO (Method Resolution Order)
+# print(TeachingAssistant.mro()) 
 ```
 
 Output:
 ```
-This function is in school.
-This function is in student 1.
+This function is in SchoolFaculty.
+This function is in Student.
+This function is in Teacher.
+This function is in TeachingAssistant.
 ```
 
-Date : 27 July 2022 
+Date : 27 July 2022
 
 -------------------
+
+## Detailed Control Flow
+
+Control flow statements are fundamental to programming, allowing you to dictate the order in which code is executed. Python offers several clear and powerful control flow mechanisms.
+
+### `for` Loops
+
+`for` loops are used for iterating over a sequence (that is either a list, a tuple, a dictionary, a set, or a string) or other iterable objects.
+
+#### Iterating with `range()`
+The `range()` function generates a sequence of numbers, which is often used for looping a specific number of times.
+
+```python
+# Example: Iterating a specific number of times
+print("--- Iterating with range() ---")
+for i in range(5):  # Generates numbers from 0 to 4
+    print(f"Current number: {i}")
+
+# Example: range() with start, stop, and step
+print("\n--- range() with start, stop, step ---")
+for i in range(2, 10, 2):  # Generates numbers from 2 up to (but not including) 10, with a step of 2
+    print(f"Even number: {i}")
+```
+Output:
+```
+--- Iterating with range() ---
+Current number: 0
+Current number: 1
+Current number: 2
+Current number: 3
+Current number: 4
+
+--- range() with start, stop, step ---
+Even number: 2
+Even number: 4
+Even number: 6
+Even number: 8
+```
+
+#### Iterating over Lists
+You can directly iterate over the elements of a list.
+
+```python
+# Example: Iterating over a list
+print("\n--- Iterating over a list ---")
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(f"Current fruit: {fruit}")
+
+# Example: Iterating over a list with index using enumerate()
+print("\n--- Iterating over a list with index ---")
+for index, fruit in enumerate(fruits):
+    print(f"Fruit at index {index}: {fruit}")
+```
+Output:
+```
+--- Iterating over a list ---
+Current fruit: apple
+Current fruit: banana
+Current fruit: cherry
+
+--- Iterating over a list with index ---
+Fruit at index 0: apple
+Fruit at index 1: banana
+Fruit at index 2: cherry
+```
+
+#### Iterating over Strings
+Strings are sequences of characters, and you can iterate over them.
+
+```python
+# Example: Iterating over a string
+print("\n--- Iterating over a string ---")
+word = "Python"
+for char in word:
+    print(f"Character: {char}")
+```
+Output:
+```
+--- Iterating over a string ---
+Character: P
+Character: y
+Character: t
+Character: h
+Character: o
+Character: n
+```
+
+#### Iterating over Dictionaries
+When iterating over dictionaries, you can loop through keys, values, or key-value pairs.
+
+```python
+# Example: Iterating over dictionary keys (default behavior)
+print("\n--- Iterating over dictionary keys ---")
+my_dict = {"name": "Alice", "age": 30, "city": "New York"}
+for key in my_dict:
+    print(f"Key: {key}, Value: {my_dict[key]}")
+
+# Example: Iterating over dictionary values
+print("\n--- Iterating over dictionary values ---")
+for value in my_dict.values():
+    print(f"Value: {value}")
+
+# Example: Iterating over dictionary key-value pairs
+print("\n--- Iterating over dictionary key-value pairs ---")
+for key, value in my_dict.items():
+    print(f"Key: {key}, Value: {value}")
+```
+Output:
+```
+--- Iterating over dictionary keys ---
+Key: name, Value: Alice
+Key: age, Value: 30
+Key: city, Value: New York
+
+--- Iterating over dictionary values ---
+Value: Alice
+Value: 30
+Value: New York
+
+--- Iterating over dictionary key-value pairs ---
+Key: name, Value: Alice
+Key: age, Value: 30
+Key: city, Value: New York
+```
+
+### `while` Loops
+
+`while` loops are used to execute a block of statements as long as a given condition is true.
+
+#### Basic Structure
+The loop continues until the condition evaluates to `False`.
+
+```python
+# Example: Basic while loop
+print("\n--- Basic while loop ---")
+count = 0
+while count < 5:  # Condition: count is less than 5
+    print(f"Count is: {count}")
+    count += 1  # Increment count, crucial to avoid an infinite loop
+print("Loop finished.")
+```
+Output:
+```
+--- Basic while loop ---
+Count is: 0
+Count is: 1
+Count is: 2
+Count is: 3
+Count is: 4
+Loop finished.
+```
+
+#### Counter-Controlled Loops
+`while` loops are often used when the number of iterations isn't known beforehand, but they can also be used for counter-controlled iterations, similar to `for` loops with `range()`.
+
+```python
+# Example: Counter-controlled while loop
+print("\n--- Counter-controlled while loop ---")
+i = 0
+limit = 3
+while i < limit:
+    print(f"Iteration number {i+1}")
+    i += 1
+print("Counter-controlled loop finished.")
+```
+Output:
+```
+--- Counter-controlled while loop ---
+Iteration number 1
+Iteration number 2
+Iteration number 3
+Counter-controlled loop finished.
+```
+**Important:** When using `while` loops, ensure that the condition will eventually become false; otherwise, you'll create an infinite loop.
+
+### `break` and `continue` Statements
+
+`break` and `continue` are statements that alter the flow of a loop.
+
+*   **`break`:** Terminates the current loop prematurely and transfers control to the statement immediately following the loop.
+*   **`continue`:** Skips the rest of the code inside the current iteration of the loop and proceeds to the next iteration.
+
+#### Combined Practical Example
+
+```python
+# Example: Using break and continue
+print("\n--- break and continue example ---")
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+for num in numbers:
+    if num % 2 != 0:
+        # If the number is odd, skip to the next iteration
+        print(f"Skipping odd number: {num}")
+        continue
+    
+    if num > 6:
+        # If the number is greater than 6, terminate the loop
+        print(f"Number {num} is greater than 6. Breaking loop.")
+        break
+    
+    # This will only be executed for even numbers <= 6
+    print(f"Processing even number: {num}")
+
+print("Loop finished after break/continue.")
+```
+Output:
+```
+--- break and continue example ---
+Skipping odd number: 1
+Processing even number: 2
+Skipping odd number: 3
+Processing even number: 4
+Skipping odd number: 5
+Processing even number: 6
+Skipping odd number: 7
+Number 8 is greater than 6. Breaking loop.
+Loop finished after break/continue.
+```
+
+### `if-elif-else` Chains (The `elif` Statement)
+
+While `if` and `else` provide basic conditional logic, `elif` (short for "else if") allows you to check multiple expressions for `True` and execute a block of code as soon as one of the conditions is met.
+
+#### Structure and Usage
+
+```python
+# Example: if-elif-else chain
+print("\n--- if-elif-else chain example ---")
+score = 75
+
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+elif score >= 60:
+    grade = "D"
+else:
+    grade = "F"
+
+print(f"The score is {score}, which corresponds to a grade of {grade}.")
+
+# Another example
+name = "Alice"
+if name == "Bob":
+    print("Hello Bob!")
+elif name == "Alice":
+    print("Hello Alice!") # This block will be executed
+else:
+    print("Hello stranger!")
+```
+Output:
+```
+--- if-elif-else chain example ---
+The score is 75, which corresponds to a grade of C.
+Hello Alice!
+```
+Only one block in the `if-elif-else` chain will be executed – the one corresponding to the first true condition, or the `else` block if no conditions are true.
+
+## List Comprehensions
+
+List comprehensions provide a concise and readable way to create lists. They are often more efficient and easier to understand than using explicit `for` loops to populate a list.
+
+**Definition and Syntax:**
+
+A list comprehension consists of brackets containing an expression followed by a `for` clause, then zero or more `for` or `if` clauses. The general syntax is:
+
+```
+[expression for item in iterable if condition]
+```
+
+*   `expression`: The expression to compute for each item.
+*   `item`: The variable representing each element in the `iterable`.
+*   `iterable`: The sequence or collection to iterate over (e.g., a list, range, string).
+*   `condition` (optional): A filter that only includes items for which the condition is true.
+
+**Benefits:**
+
+*   **Conciseness:** They are often shorter than equivalent `for` loop constructs.
+*   **Readability:** When used appropriately, they can make code easier to read by clearly stating the intent of the list creation.
+*   **Efficiency:** In many cases, list comprehensions can be faster than appending to a list in a `for` loop due to internal optimizations in Python.
+
+**Examples:**
+
+#### 1. Generating a List of Squares
+
+Let's create a list of the first 10 perfect squares.
+
+```python
+# Using a for loop
+squares_loop = []
+for x in range(1, 11):  # Numbers from 1 to 10
+    squares_loop.append(x * x)
+print(f"Squares (using for loop): {squares_loop}")
+
+# Using a list comprehension
+squares_comp = [x * x for x in range(1, 11)]
+print(f"Squares (using list comprehension): {squares_comp}")
+```
+Output:
+```
+Squares (using for loop): [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+Squares (using list comprehension): [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
+The list comprehension version is more compact and directly expresses the transformation of each `x` into `x*x`.
+
+#### 2. Filtering for Even Numbers
+
+Let's create a list of even numbers from a given list of numbers.
+
+```python
+# Using a for loop with an if condition
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+even_numbers_loop = []
+for num in numbers:
+    if num % 2 == 0:
+        even_numbers_loop.append(num)
+print(f"Even numbers (using for loop): {even_numbers_loop}")
+
+# Using a list comprehension with an if condition
+even_numbers_comp = [num for num in numbers if num % 2 == 0]
+print(f"Even numbers (using list comprehension): {even_numbers_comp}")
+```
+Output:
+```
+Even numbers (using for loop): [2, 4, 6, 8, 10]
+Even numbers (using list comprehension): [2, 4, 6, 8, 10]
+```
+Again, the list comprehension offers a more succinct way to express the filtering and creation of the new list.
+
+#### 3. More Complex Example: String Manipulation
+
+Let's convert a list of strings to uppercase, but only for strings longer than 3 characters.
+
+```python
+words = ["apple", "bat", "cherry", "dog", "elephant"]
+uppercase_long_words = [word.upper() for word in words if len(word) > 3]
+print(f"Uppercase long words: {uppercase_long_words}")
+```
+Output:
+```
+Uppercase long words: ['APPLE', 'CHERRY', 'ELEPHANT']
+```
+
+List comprehensions are a powerful feature in Python for creating lists dynamically. They are a cornerstone of idiomatic Python code.
+
+## f-Strings for String Formatting
+
+Introduced in Python 3.6, f-strings (formatted string literals) provide a highly readable and concise way to embed expressions inside string literals for formatting.
+
+**Syntax:**
+
+An f-string is prefixed with an `f` or `F` before the opening quotation mark. Inside the string, you can embed Python expressions by placing them inside curly braces `{}`.
+
+```python
+name = "Alice"
+age = 30
+greeting = f"Hello, my name is {name} and I am {age} years old."
+print(greeting)
+```
+Output:
+```
+Hello, my name is Alice and I am 30 years old.
+```
+
+**Key Features and Benefits:**
+
+*   **Readability:** They are generally more readable than older formatting methods like `%`-formatting or `str.format()`. The expressions are directly embedded in the string.
+*   **Conciseness:** They often require less typing.
+*   **Arbitrary Expressions:** You can embed any valid Python expression inside the curly braces. This includes variable names, function calls, arithmetic operations, etc.
+*   **Speed:** F-strings are often faster than other string formatting methods.
+
+**Examples:**
+
+#### 1. Embedding Variables
+
+This is the most common use case.
+
+```python
+# Example: Embedding variables
+print("\n--- Embedding variables with f-strings ---")
+item = "book"
+price = 19.99
+quantity = 2
+message = f"Item: {item.capitalize()}, Price: ${price:.2f}, Quantity: {quantity}"
+print(message)
+# Notice the formatting options like .capitalize() and :.2f for price
+```
+Output:
+```
+--- Embedding variables with f-strings ---
+Item: Book, Price: $19.99, Quantity: 2
+```
+
+#### 2. Embedding Expressions and Function Calls
+
+You can perform calculations or call functions directly within f-strings.
+
+```python
+# Example: Embedding expressions and function calls
+print("\n--- Embedding expressions and function calls ---")
+x = 10
+y = 5
+calculation_result = f"The sum of {x} and {y} is {x + y}."
+print(calculation_result)
+
+def get_user_status(is_active):
+    return "Active" if is_active else "Inactive"
+
+user_active = True
+status_message = f"User status: {get_user_status(user_active).upper()}" # Calling function and method
+print(status_message)
+```
+Output:
+```
+--- Embedding expressions and function calls ---
+The sum of 10 and 5 is 15.
+User status: ACTIVE
+```
+
+#### 3. Multiline f-Strings
+
+F-strings can span multiple lines, just like regular strings.
+
+```python
+# Example: Multiline f-string
+print("\n--- Multiline f-string ---")
+name = "Bob"
+age = 25
+city = "London"
+
+multiline_info = (
+    f"User Information:\n"
+    f"  Name: {name}\n"
+    f"  Age: {age}\n"
+    f"  City: {city}"
+)
+print(multiline_info)
+```
+Output:
+```
+--- Multiline f-string ---
+User Information:
+  Name: Bob
+  Age: 25
+  City: London
+```
+
+#### 4. Debugging with f-Strings (Python 3.8+)
+
+Python 3.8 introduced a convenient way to print both an expression and its value, which is great for debugging.
+
+```python
+# Example: Debugging with f-strings (Python 3.8+)
+print("\n--- Debugging with f-strings (Python 3.8+) ---")
+num_apples = 10
+num_oranges = 5
+# By adding '=' after the variable, both the variable name and its value are printed
+print(f"{num_apples=}, {num_oranges=}") 
+total_fruit = num_apples + num_oranges
+print(f"{total_fruit=}")
+```
+Output (if run with Python 3.8+):
+```
+--- Debugging with f-strings (Python 3.8+) ---
+num_apples=10, num_oranges=5
+total_fruit=15
+```
+
+F-strings have become the preferred method for string formatting in modern Python due to their clarity and performance.
 
 ## Python Functions
 Python Functions is a block of statements which return the specific task.
