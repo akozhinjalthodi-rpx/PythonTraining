@@ -592,7 +592,7 @@ try:
     f = open("manual_example.txt", "w")
     f.write("This is a manually managed file.\n")
     # Imagine an error occurring here:
-    # raise ValueError("Something went wrong!") 
+    # raise ValueError("Something went wrong!")
     print("File 'manual_example.txt' written (still open).")
 except IOError as e:
     print(f"An IOError occurred: {e}")
@@ -743,7 +743,7 @@ for num in MyRange(1, 3):
     print(num)
 
 print("\nIterating from 10 to 12 (exclusive) with no items to print if start >= end:")
-# This loop won't execute if MyRange(12,10) was used, 
+# This loop won't execute if MyRange(12,10) was used,
 # because the first __next__ call would immediately raise StopIteration
 for num in MyRange(12, 10): # Start is not less than end
      print(num) # This line won't be reached
@@ -801,7 +801,7 @@ except StopIteration:
 
 print("\nIterating with a for loop (re-creating the generator):")
 # For loop handles StopIteration automatically
-for value in simple_generator(): 
+for value in simple_generator():
     print(f"Value from for loop: {value}")
 ```
 Output:
@@ -1001,7 +1001,7 @@ Let's create a generator for the squares of numbers.
 ```python
 # List comprehension (creates a list in memory)
 list_comp_squares = [x*x for x in range(5)]
-print(f"List comprehension: {list_comp_squares}") 
+print(f"List comprehension: {list_comp_squares}")
 
 # Generator expression (creates a generator object)
 gen_exp_squares = (x*x for x in range(5))
@@ -1042,7 +1042,7 @@ print(f"Max of doubled even numbers: {max_val_gen}")
 Output:
 ```
 --- Summing with a generator expression ---
-Sum of squares (1 to 1,000,000): 333333833333500000 
+Sum of squares (1 to 1,000,000): 333333833333500000
 Max of doubled even numbers: 40
 ```
 
@@ -1344,36 +1344,36 @@ def process_data(data_list, divisor_str):
         for item in data_list:
             try:
                 # Attempt to convert item to a float
-                item_float = float(item) 
+                item_float = float(item)
                 result = item_float / divisor
                 results.append(result)
                 print(f"Processed {item_float} / {divisor} = {result}")
-            
+
             # Specific exception for type conversion errors
-            except ValueError as ve_item: 
+            except ValueError as ve_item:
                 print(f"Error converting item '{item}' to float: {ve_item}. Skipping.")
             # Specific exception for division by zero (though we raised a custom one earlier for the divisor itself)
             # This would catch if item_float was 0 and divisor was something else, leading to 0/non-zero which is fine,
             # but if we had item_float / 0 and `divisor` was not 0, this would be caught.
-            except ZeroDivisionError: 
+            except ZeroDivisionError:
                 print(f"Error: Division by zero when processing item '{item}'. Skipping.")
             # Generic catch for other unexpected errors during item processing
             except Exception as e_item:
                 print(f"An unexpected error occurred with item '{item}': {e_item}. Skipping.")
-                
+
     # Specific exception for type conversion of the divisor
     except ValueError as ve_divisor:
         print(f"Error: Invalid divisor '{divisor_str}'. Not a valid number. Details: {ve_divisor}")
     # Catching any other exceptions related to initial setup or general processing
     except Exception as e_general:
         print(f"A general error occurred: {e_general}")
-    
+
     # This block executes if the main try block (for divisor setup) completes without raising an exception
     else:
         print("All items in the list processed (or skipped due to item-specific errors).")
         if not results:
             print("No results were successfully calculated.")
-    
+
     # This block always executes, regardless of exceptions in try, except, or else blocks
     finally:
         print("Data processing attempt finished.")
@@ -1479,7 +1479,7 @@ def shout(text):
 print(f"Output of shout('Hello'): {shout('Hello')}")
 
 # Assigning the function shout to a variable yell
-yell = shout 
+yell = shout
 # Now, yell can be used just like shout
 print(f"Output of yell('Hello'): {yell('Hello')}")
 ```
@@ -1530,7 +1530,7 @@ def create_adder_function(x):
 # Create an "add_15" function:
 # When create_adder_function(15) is called, it returns the 'adder' function,
 # where 'x' is fixed at 15 due to closure.
-add_15 = create_adder_function(15) 
+add_15 = create_adder_function(15)
 
 # Now, add_15 is a function that takes one argument (y) and adds 15 to it.
 result = add_15(10) # This calls the inner 'adder' function with y=10 (and x=15)
@@ -1576,7 +1576,7 @@ Let's create a decorator that adds a welcome message to any function that return
 print("\n--- Basic Decorator Example ---")
 def welcome_decorator(original_function):
     """
-    This is the decorator function. It takes another function 
+    This is the decorator function. It takes another function
     (original_function) as an argument.
     """
     def wrapper_function(*args, **kwargs):
@@ -1587,12 +1587,12 @@ def welcome_decorator(original_function):
         """
         print("Wrapper executed before calling", original_function.__name__)
         # Call the original function and get its result
-        result = original_function(*args, **kwargs) 
+        result = original_function(*args, **kwargs)
         # Add new behavior
-        return f"Welcome to {result}!" 
-    
+        return f"Welcome to {result}!"
+
     # The decorator returns the wrapper function
-    return wrapper_function 
+    return wrapper_function
 
 # Applying the decorator using @ syntax
 @welcome_decorator
@@ -1603,7 +1603,7 @@ def get_website_name(name):
 
 # Calling the decorated function
 # This actually calls the 'wrapper_function' returned by 'welcome_decorator'
-output = get_website_name("GeeksforGeeks") 
+output = get_website_name("GeeksforGeeks")
 print(f"Output after decoration: {output}")
 
 # Without @ syntax (manual decoration)
@@ -1740,11 +1740,11 @@ Metacharacters are special characters that have a unique meaning within a regula
     ```python
     import re
     s = 'geeks.forgeeks'
-    
+
     # '.' matches any character (here, 'g')
-    match_any = re.search(r'.', s) 
+    match_any = re.search(r'.', s)
     print(f"Search for '.': {match_any}") # Output: <_sre.SRE_Match object; span=(0, 1), match='g'>
-    
+
     # '\.' matches the literal dot character
     match_literal_dot = re.search(r'\.', s)
     print(f"Search for '\.': {match_literal_dot}") # Output: <_sre.SRE_Match object; span=(5, 6), match='.'>
@@ -1763,9 +1763,9 @@ Metacharacters are special characters that have a unique meaning within a regula
     text = "The quick brown fox jumps over 1 lazy dog."
     vowels = re.findall(r'[aeiou]', text) # Find all lowercase vowels
     print(f"Vowels: {vowels}") # Output: ['e', 'u', 'i', 'o', 'o', 'u', 'o', 'e', 'a', 'o']
-    
+
     non_digits = re.findall(r'[^0-9]', text) # Find all non-digit characters
-    # print(f"Non-digits: {''.join(non_digits)}") 
+    # print(f"Non-digits: {''.join(non_digits)}")
     ```
 
 #### `^` – Caret (Start of String/Line)
@@ -1926,12 +1926,12 @@ import re
 text = "Hello my Number is 12345 and my friend's number is 98765."
 
 # Find all sequences of digits
-digits = re.findall(r'\d+', text) 
+digits = re.findall(r'\d+', text)
 print(f"Digits found: {digits}") # Output: ['12345', '98765']
 
 # Find all sequences of word characters (words)
 words = re.findall(r'\w+', text)
-print(f"Words found: {words}") 
+print(f"Words found: {words}")
 # Output: ['Hello', 'my', 'Number', 'is', '12345', 'and', 'my', 'friend', 's', 'number', 'is', '98765']
 
 # Example with capturing groups:
@@ -1939,8 +1939,8 @@ print(f"Words found: {words}")
 emails = "user1@example.com, user2@test.org"
 # Pattern with two groups: (username)@(domain_part)
 email_parts = re.findall(r'([\w.-]+)@([\w.-]+)', emails)
-print(f"Email parts: {email_parts}") 
-# Output: [('user1', 'example.com'), ('user2', 'test.org')] 
+print(f"Email parts: {email_parts}")
+# Output: [('user1', 'example.com'), ('user2', 'test.org')]
 # If you only want the full email, use a non-capturing group (?:...) or no group for the whole match.
 full_emails = re.findall(r'[\w.-]+@[\w.-]+', emails) # No capturing groups
 print(f"Full emails: {full_emails}")
@@ -1963,7 +1963,7 @@ import re
 
 # Compile a pattern to find words starting with 'c' (case-insensitive)
 # Case-insensitive matching due to re.IGNORECASE
-pattern_obj = re.compile(r'\bc\w*', re.IGNORECASE) 
+pattern_obj = re.compile(r'\bc\w*', re.IGNORECASE)
 
 text1 = "Cats, dogs, and chickens are common."
 text2 = "A Cute cat."
@@ -2005,7 +2005,7 @@ print(f"Words in 'I went to him...': {p_multi_w.findall('I went to him at 11 A.M
 # \W matches a single non-word character
 p_non_w = re.compile(r'\W')
 print(f"Non-word chars in 'he said ***': {p_non_w.findall('he said *** in some_language.')}")
-# Output: [' ', ' ', '*', '*', '*', ' ', ' ', '.'] 
+# Output: [' ', ' ', '*', '*', '*', ' ', ' ', '.']
 ```
 
 **Example: `ab*` with `compile()`**
@@ -2013,7 +2013,7 @@ The pattern `ab*` means: an 'a', followed by zero or more 'b's.
 ```python
 import re
 p_ab_star = re.compile(r'ab*')
-test_string = "ababbaabbb" 
+test_string = "ababbaabbb"
 # Matches:
 # 1. 'ab' at index 0
 # 2. 'abb' at index 2
@@ -2042,7 +2042,7 @@ import re # Use import re once at the top of your script normally
 # \W+ matches one or more non-alphanumeric characters (e.g., ',', ' ').
 # The parts of the string *between* these delimiters are returned.
 print(f"Split 'Words, words , Words' by '\\W+': {re.split(r'\W+', 'Words, words , Words')}")
-# Output: ['Words', 'words', 'Words'] 
+# Output: ['Words', 'words', 'Words']
 
 # Note on "Word's words Words":
 # ' (apostrophe) is a non-alphanumeric character.
@@ -2081,7 +2081,7 @@ print(f"Split '{text_mixed_case}' by '[a-f]+' (IGNORECASE): {re.split(r'[a-f]+',
 # - 'e', 'r', 'e' in 'Here' are matched. The part *after* the last 'e' (before end of string) is an empty string.
 
 print(f"Split '{text_mixed_case}' by '[a-f]+' (case-sensitive): {re.split(r'[a-f]+', text_mixed_case)}")
-# Output: ['A', 'y, Boy oh ', 'oy, ', 'om', ' H', 'r', ''] 
+# Output: ['A', 'y, Boy oh ', 'oy, ', 'om', ' H', 'r', '']
 # Here 'A', 'B', 'H' are not splitters because they are uppercase.
 ```
 
@@ -2139,7 +2139,7 @@ import re
 # Perform substitution and get the count of replacements
 result_tuple = re.subn('ub', '~*', 'Subject has Uber booked already')
 print(f"subn result (case-sensitive): {result_tuple}")
-# Output: ('S~*ject has Uber booked already', 1) 
+# Output: ('S~*ject has Uber booked already', 1)
 # (The new string, number of substitutions)
 
 result_tuple_ignorecase = re.subn('ub', '~*', 'Subject has Uber booked already', flags=re.IGNORECASE)
@@ -2180,7 +2180,7 @@ print(f"Escaped: {escaped_string}")
 # if you want to match the literal_string exactly.
 text_to_search = "Please visit example.com [v1.0*] + (main branch)? for details."
 match = re.search(escaped_string, text_to_search)
-print(f"Search result using escaped string: {match}") 
+print(f"Search result using escaped string: {match}")
 # Output: <re.Match object; span=(13, 49), match='example.com [v1.0*] + (main branch)?'>
 ```
 
@@ -2200,7 +2200,7 @@ import re
 text = "I was born on June 24, 1990. My friend was born on July 10."
 # Pattern to match a month name followed by a day number.
 # Parentheses create capturing groups for the month and day.
-pattern = r"([a-zA-Z]+) (\d+)" 
+pattern = r"([a-zA-Z]+) (\d+)"
 
 match_obj = re.search(pattern, text) # Search for the pattern in the text
 
@@ -2241,13 +2241,13 @@ text = "User: john_doe, ID: 12345, Role: admin"
 # Using named groups: ?P<username> and ?P<userid>
 match = re.search(r"User: (?P<username>\w+), ID: (?P<userid>\d+)", text)
 if match:
-    print(f"Full match (group 0): {match.group(0)}") 
+    print(f"Full match (group 0): {match.group(0)}")
     # Output: User: john_doe, ID: 12345
     print(f"Username (group 'username'): {match.group('username')}") # Access by name
     # Output: john_doe
     print(f"ID (group 2): {match.group(2)}") # Access by index (userid is the 2nd group)
     # Output: 12345
-    print(f"Tuple of all captured groups: {match.groups()}") 
+    print(f"Tuple of all captured groups: {match.groups()}")
     # Output: ('john_doe', '12345')
 ```
 
@@ -2297,11 +2297,11 @@ match_instance = compiled_pattern.search(text_str) # Search for 'This'
 
 if match_instance:
     print(f"\n--- Match Object Attributes ---")
-    print(f"Matched string: '{match_instance.group()}'") 
+    print(f"Matched string: '{match_instance.group()}'")
     # Output: 'This'
-    print(f"Regex object used: {match_instance.re}")        
+    print(f"Regex object used: {match_instance.re}")
     # Output: re.compile('\\b\\w{4}\\b')
-    print(f"Original string searched: '{match_instance.string}'") 
+    print(f"Original string searched: '{match_instance.string}'")
     # Output: 'This is a test sentence.'
 ```
 
@@ -2322,23 +2322,23 @@ text = "Chapter 2: The Beginning"
 # Using re.match() - only matches if the pattern is at the START of the string
 match_at_start = re.match(r"Chapter \d+", text)
 if match_at_start:
-    print(f"re.match() for 'Chapter \\d+' found: '{match_at_start.group()}'") 
+    print(f"re.match() for 'Chapter \\d+' found: '{match_at_start.group()}'")
     # Output: 'Chapter 2'
 else:
     print("re.match() for 'Chapter \\d+' found nothing.")
 
 # This pattern is not at the start of 'text', so re.match() will fail.
-match_middle_pattern = re.match(r"The Beginning", text) 
+match_middle_pattern = re.match(r"The Beginning", text)
 if match_middle_pattern:
     print(f"re.match() for 'The Beginning' found: '{match_middle_pattern.group()}'")
 else:
-    print("re.match() for 'The Beginning' found nothing.") 
+    print("re.match() for 'The Beginning' found nothing.")
     # Output: re.match() for 'The Beginning' found nothing.
 
 # Using re.search() - scans the whole string for the first match
 search_for_middle = re.search(r"The Beginning", text)
 if search_for_middle:
-    print(f"re.search() for 'The Beginning' found: '{search_for_middle.group()}'") 
+    print(f"re.search() for 'The Beginning' found: '{search_for_middle.group()}'")
     # Output: 'The Beginning'
 else:
     print("re.search() for 'The Beginning' found nothing.")

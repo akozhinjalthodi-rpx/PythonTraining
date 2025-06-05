@@ -51,17 +51,17 @@ file_object = open("file_name.txt", "access_mode")
     *   **Cross-platform paths:** For better portability, use `pathlib.Path`:
         ```python
         from pathlib import Path
-        file_path = Path("D:") / "Text" / "MyFile2.txt" 
-        # file2 = open(file_path, "w+") 
+        file_path = Path("D:") / "Text" / "MyFile2.txt"
+        # file2 = open(file_path, "w+")
         ```
 
 **Example (Traditional, less recommended way):**
 ```python
 # Open "MyFile.txt" (in the same directory) in append mode
-# file1 = open("MyFile.txt", "a") 
+# file1 = open("MyFile.txt", "a")
 
 # Open "MyFile2.txt" (in D:\Text) in write and read mode, creating it if it doesn't exist
-# file2 = open(r"D:\Text\MyFile2.txt", "w+") 
+# file2 = open(r"D:\Text\MyFile2.txt", "w+")
 ```
 (Note: As mentioned, `with open(...)` is preferred for opening files.)
 
@@ -103,7 +103,7 @@ try:
     f = open("manual_example.txt", "w")
     f.write("This is a manually managed file.\n")
     # Imagine an error occurring here:
-    # result = 10 / 0 
+    # result = 10 / 0
 except IOError as e:
     print(f"An IOError occurred: {e}")
 # except ZeroDivisionError as zde: # Example of another error
@@ -123,7 +123,7 @@ try:
     with open("with_example.txt", "w") as f:
         f.write("This file is managed by a 'with' statement.\n")
         # Imagine an error occurring here:
-        # result = 10 / 0 
+        # result = 10 / 0
         print("File 'with_example.txt' written (will be auto-closed).")
     # File 'f' is automatically closed here.
 # except ZeroDivisionError as zde: # Example of another error
@@ -204,7 +204,7 @@ try:
         # This is necessary if you want to read the file again from the start
         # without closing and reopening it.
         print("\nMoving file pointer to the beginning using seek(0)...")
-        file.seek(0) 
+        file.seek(0)
 
         # readline(): Reads a single line from the current pointer position
         print("\nOutput of Readline function (first line):")
@@ -224,7 +224,7 @@ try:
         print("\nOutput of Readline(9) function (first 9 chars of the first line):")
         print(file.readline(9)) # Reads up to 9 chars from the current line
         print("--- End of readline(9) ---")
-        
+
         file.seek(0) # Reset pointer
 
         # readlines(): Reads all lines from the current pointer position and returns them as a list of strings
@@ -361,7 +361,7 @@ try:
         content = f.read()
         print(f"Read content from '{file_name_encoded}' (UTF-8):")
         print(content)
-    
+
     # Attempting to read with an incompatible encoding (ASCII) to show potential error
     print("\nAttempting to read the UTF-8 encoded file as ASCII...")
     with open(file_name_encoded, "r", encoding="ascii") as f: # This will likely cause an error
@@ -583,7 +583,7 @@ You can take multiple inputs from the user in a single line by splitting the inp
 # Taking multiple integer inputs separated by spaces
 try:
     print("Enter three numbers separated by spaces (e.g., 10 20 30):")
-    a, b, c = map(int, input().split()) 
+    a, b, c = map(int, input().split())
     # 1. input() reads the line: "10 20 30"
     # 2. .split() splits it by space into a list: ['10', '20', '30']
     # 3. map(int, ...) applies int() to each item: [10, 20, 30]
@@ -669,7 +669,7 @@ print(f"\nOriginal Tuple: {original_tuple}")
 try:
     new_element_str = input("Enter a new integer element to add: ")
     new_element = int(new_element_str)
-    
+
     # Create a new tuple by concatenating
     updated_tuple = original_tuple + (new_element,) # Note the comma to make (new_element,) a tuple
     print(f"Tuple after adding the new element: {updated_tuple}")
@@ -808,7 +808,7 @@ b = 3.0
 print(f"Variable 'b' is {b} of type: {type(b)}")
 
 # Python automatically converts 'a' to float for the addition
-c = a + b 
+c = a + b
 print(f"Sum 'c' ({a} + {b}) is {c} of type: {type(c)}")
 
 # Python automatically converts 'a' to float for the multiplication
