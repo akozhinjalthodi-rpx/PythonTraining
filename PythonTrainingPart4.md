@@ -59,7 +59,7 @@ print(f"calc.add(10, 2) = {result_add}")       # Output: 12
 print(f"calc.subtract(10, 2) = {result_subtract}") # Output: 8
 ```
 
-### The `from ... import ...` Statement 
+### The `from ... import ...` Statement
 This statement allows you to import specific attributes (functions, classes, variables) directly from a module into your current script's namespace. This means you can use the imported items directly without prefixing them with the module name.
 
 **Syntax:**
@@ -109,7 +109,7 @@ Let's assume `calc.py` has `add` and `subtract`.
 # Assume calc.py exists with add() and subtract()
 
 # Generally discouraged:
-from calc import * 
+from calc import *
 
 result1 = add(20, 5)       # Works, but 'add' is now in the global namespace
 result2 = subtract(20, 5)  # Works, but 'subtract' is also global
@@ -208,18 +208,18 @@ def subtract(x, y):
 # It will NOT execute if calc.py is imported into another module.
 if __name__ == "__main__":
     print("Running calc.py as a standalone script!")
-    
+
     # Example usage or test code for the module's functions
     num1 = 15
     num2 = 7
-    
+
     sum_result = add(num1, num2)
     difference_result = subtract(num1, num2)
-    
+
     print(f"The sum of {num1} and {num2} is: {sum_result}")
     print(f"The difference between {num1} and {num2} is: {difference_result}")
-    
-    print("\nValue of __name__ in calc.py when run directly:", __name__) 
+
+    print("\nValue of __name__ in calc.py when run directly:", __name__)
     # Will print: __main__
 ```
 
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     Running calc.py as a standalone script!
     The sum of 15 and 7 is: 22
     The difference between 15 and 7 is: 8
-    
+
     Value of __name__ in calc.py when run directly: __main__
     ```
 
@@ -246,7 +246,7 @@ if __name__ == "__main__":
     result = calc.add(100, 50)
     print(f"calc.add(100, 50) = {result}")
 
-    print("\nValue of __name__ in main_program.py:", __name__) 
+    print("\nValue of __name__ in main_program.py:", __name__)
     # Will print: __main__
     # To see calc.py's __name__ when imported, you'd need to print it from calc.py
     # outside the if __name__ == "__main__": block, or have a function in calc.py return it.
@@ -281,7 +281,7 @@ import math # Import the built-in math module
 import random # Import the built-in random module
 
 print("--- Names defined in the 'math' module ---")
-# print(dir(math)) 
+# print(dir(math))
 # Output will be a long list of math functions like 'acos', 'sqrt', 'pi', etc.
 
 print("\n--- Names defined in the 'random' module ---")
@@ -300,7 +300,7 @@ The actual output for `dir(random)` would be similar to:
 ```
 (Note: The exact list of names can vary slightly between Python versions.)
 
-### Code Snippet Illustrating Python Built-in Modules: 
+### Code Snippet Illustrating Python Built-in Modules:
 
 This snippet demonstrates the use of some common functions from Python's built-in `math`, `random`, and `datetime` modules.
 
@@ -450,12 +450,12 @@ response = requests.get(url, params=None, **kwargs)
 import requests
 
 # Target URL (GitHub API endpoint for a user)
-url = 'https://api.github.com/users/naveenkrnl' 
+url = 'https://api.github.com/users/naveenkrnl'
 
 try:
     # Making a GET request
     response = requests.get(url)
-    
+
     # Check if the request was successful (status code 200-299)
     response.raise_for_status() # This will raise an HTTPError for bad responses (4xx or 5xx)
 
@@ -467,7 +467,7 @@ try:
 
     # For text-based responses (like JSON or HTML), use .text
     # print(f"Text Content: {response.text}")
-    
+
     # If the response is JSON, you can parse it directly
     # It's good practice to check Content-Type or use a try-except for .json()
     if 'application/json' in response.headers.get('Content-Type', ''):
@@ -496,7 +496,7 @@ Status Code: 200
 User Data (parsed JSON):
   Login: naveenkrnl
   ID: 14209499
-  Public Repos: 33 
+  Public Repos: 33
 ```
 (Note: The exact number of public repos and other details might change.)
 
@@ -528,11 +528,11 @@ try:
     print(f"Constructed URL: {response_with_params.url}")
 
     # httpbin.org/get returns a JSON response reflecting the request details
-    response_data = response_with_params.json() 
-    
+    response_data = response_with_params.json()
+
     print("\nResponse JSON (args part shows received parameters):")
     # The 'args' key in the response from httpbin.org/get will show the parameters it received
-    print(response_data.get('args')) 
+    print(response_data.get('args'))
 
 except requests.exceptions.HTTPError as http_err:
     print(f"HTTP error occurred: {http_err}")
@@ -588,7 +588,7 @@ try:
 
     print("--- POST Request with Form Data ---")
     print(f"Status Code: {response_form.status_code}")
-    
+
     # httpbin.org/post returns the received data in its response
     response_data_form = response_form.json()
     print(f"Sent Form Data (reflected by server): {response_data_form.get('form')}")
@@ -665,7 +665,7 @@ url_get_headers = 'https://httpbin.org/headers' # This endpoint returns the requ
 custom_headers = {
     'User-Agent': 'MyPythonApp/1.0 (LearningRequests)',
     'X-Custom-Header': 'MyCustomValue123',
-    'Accept': 'application/json' 
+    'Accept': 'application/json'
 }
 
 try:
@@ -674,7 +674,7 @@ try:
 
     print("--- GET Request with Custom Headers ---")
     print(f"Status Code: {response_custom_headers.status_code}")
-    
+
     # httpbin.org/headers returns the headers it received
     received_headers = response_custom_headers.json().get('headers', {})
     print("\nHeaders received by server:")
@@ -721,7 +721,7 @@ import requests
 import json # For json.JSONDecodeError if using older requests/Python versions
 
 # Example: Making a request to inspect its response
-url = 'https://api.github.com/users/python-requests' 
+url = 'https://api.github.com/users/python-requests'
 # A more specific endpoint that's likely to return JSON
 try:
     response = requests.get(url, timeout=10) # Added a timeout for robustness
@@ -741,18 +741,18 @@ try:
     print(f"\n--- Headers ---")
     print(f"Response Headers (dict-like object): {response.headers}")
     # Headers are case-insensitive dictionary-like objects
-    print(f"Content-Type: {response.headers.get('Content-Type')}") 
+    print(f"Content-Type: {response.headers.get('Content-Type')}")
     print(f"Date: {response.headers.get('Date')}")
 
     # 3. Accessing the Response Body
     print(f"\n--- Response Body ---")
     # response.content: Raw response body in bytes (for images, files, etc.)
-    # print(f"Raw content (first 100 bytes): {response.content[:100]}") 
-    
+    # print(f"Raw content (first 100 bytes): {response.content[:100]}")
+
     # response.text: Decoded response body as a string (for text-based responses like HTML, JSON)
     # Requests attempts to guess the encoding based on headers.
     # You can also set response.encoding = 'utf-8' (or other) before accessing .text if needed.
-    print(f"Text content (first 200 chars): {response.text[:200]}...") 
+    print(f"Text content (first 200 chars): {response.text[:200]}...")
 
     # 4. Parsing JSON Response with response.json()
     print(f"\n--- JSON Parsing ---")
@@ -807,7 +807,7 @@ Successfully parsed JSON response:
 
 --- Other Info ---
 URL of the request: https://api.github.com/users/python-requests
-Time elapsed for the request: 0:00:00.XXXXXX 
+Time elapsed for the request: 0:00:00.XXXXXX
 ```
 
 ### Error Handling in Requests
@@ -848,7 +848,7 @@ url_test = 'https://example.com/nonexistentpage' # Likely a 404
 try:
     response = requests.get(url_test, timeout=2.5) # Set a timeout of 2.5 seconds
     response.raise_for_status() # Check for HTTP errors
-    
+
     # Process successful response here
     print("Response content:", response.text[:100] + "...")
 
@@ -913,7 +913,7 @@ try:
     response_basic.raise_for_status() # Check for HTTP errors (401 if auth fails, etc.)
     print(f"Basic Authentication Successful! Status Code: {response_basic.status_code}")
     # For httpbin.org/basic-auth, the response JSON indicates authenticated status
-    # print(f"Response Content: {response_basic.json()}") 
+    # print(f"Response Content: {response_basic.json()}")
 
     # Method 2: Using HTTPBasicAuth object (more explicit)
     # print("\n--- Attempting Basic Authentication (HTTPBasicAuth object method) ---")
@@ -965,7 +965,7 @@ try:
     response_token_auth.raise_for_status()
 
     print(f"Status Code: {response_token_auth.status_code}")
-    
+
     # httpbin.org/headers will echo back the headers sent
     received_headers = response_token_auth.json().get('headers', {})
     print("Headers sent to server:")
@@ -1053,7 +1053,7 @@ try:
     # When verify=False, requests will accept any TLS certificate presented by the server
     # and will ignore hostname mismatches and/or expired certificates, which is insecure.
     # An InsecureRequestWarning will be issued unless suppressed.
-    response_no_verify = requests.get(url_disable_ssl, verify=False) 
+    response_no_verify = requests.get(url_disable_ssl, verify=False)
     print(f"Status code from {url_disable_ssl} (SSL verification disabled): {response_no_verify.status_code}")
     # Even if status is 200, the connection was not secure in the usual sense.
 except requests.exceptions.RequestException as e:
@@ -1099,7 +1099,7 @@ try:
     print(f"\n--- Session Object: Checking if cookie is sent back ---")
     response_get = s.get(url_get_cookies)
     response_get.raise_for_status()
-    
+
     # The response from httpbin.org/cookies will show the cookies it received from our client
     cookies_received_by_server = response_get.json().get('cookies', {})
     print(f"Cookies received by server on subsequent request: {cookies_received_by_server}")
@@ -1117,9 +1117,9 @@ print(f"\n--- Regular requests.get() (no session, no cookie persistence) ---")
 try:
     # First request sets the cookie, but it's not stored and reused by the default requests module
     # for subsequent independent calls.
-    requests.get(url_set_cookie) 
+    requests.get(url_set_cookie)
     # Second request (new, independent) won't have the cookie from the previous request.
-    r_no_session = requests.get(url_get_cookies) 
+    r_no_session = requests.get(url_get_cookies)
     r_no_session.raise_for_status()
     print(f"Cookies received by server (no session): {r_no_session.json().get('cookies')}")
 except requests.exceptions.RequestException as e:

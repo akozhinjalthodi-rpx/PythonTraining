@@ -60,7 +60,7 @@ obj = Dog()
 ```
 
 ##### The `self` Parameter:
-* In Python, instance methods (methods belonging to an object) must have `self` as their first parameter in the method definition. 
+* In Python, instance methods (methods belonging to an object) must have `self` as their first parameter in the method definition.
 * When you call an instance method like `my_object.method(arg1, arg2)`, Python automatically passes the object `my_object` as the first argument to `self`. So, the call effectively becomes `ClassName.method(my_object, arg1, arg2)`.
 * You do not explicitly pass a value for `self` when calling the method.
 * Even if a method takes no other arguments, it must still include `self` as its first parameter. For example: `def my_method(self):`.
@@ -860,7 +860,7 @@ Inheritance is defined as the mechanism of inheriting the properties of the base
 Single inheritance enables a derived class to inherit properties and methods from a single parent class, promoting code reusability and allowing for the extension of existing code.
 
 ```python
-# Python program to demonstrate single inheritance 
+# Python program to demonstrate single inheritance
 
 # Base Class
 class Parent:
@@ -909,7 +909,7 @@ class Father:
 class Son(Mother, Father):
     def display_parents_info(self): # Renamed for clarity
         # Accessing attributes and methods from both parent classes
-        print(f"Father: {self.fathername}") 
+        print(f"Father: {self.fathername}")
         print(f"Mother: {self.mothername}")
         # You can also call parent methods directly if needed:
         # self.father_info()
@@ -1034,7 +1034,7 @@ class Teacher(SchoolFaculty): # Also derived from SchoolFaculty (Hierarchical wi
 # TeachingAssistant inherits from Student and Teacher (Multiple Inheritance)
 # This creates a hybrid inheritance structure (specifically a "diamond" shape if Student and Teacher
 # were to inherit from a common grandparent of SchoolFaculty, but here it's simpler).
-class TeachingAssistant(Student, Teacher): 
+class TeachingAssistant(Student, Teacher):
     def ta_info(self):
         print("This function is in TeachingAssistant.")
 
@@ -1046,7 +1046,7 @@ ta_object.teacher_info()    # From Teacher
 ta_object.ta_info()         # From TeachingAssistant
 
 # Example of MRO (Method Resolution Order)
-# print(TeachingAssistant.mro()) 
+# print(TeachingAssistant.mro())
 ```
 
 Output:
@@ -1254,12 +1254,12 @@ for num in numbers:
         # If the number is odd, skip to the next iteration
         print(f"Skipping odd number: {num}")
         continue
-    
+
     if num > 6:
         # If the number is greater than 6, terminate the loop
         print(f"Number {num} is greater than 6. Breaking loop.")
         break
-    
+
     # This will only be executed for even numbers <= 6
     print(f"Processing even number: {num}")
 
@@ -1519,7 +1519,7 @@ print("\n--- Debugging with f-strings (Python 3.8+) ---")
 num_apples = 10
 num_oranges = 5
 # By adding '=' after the variable, both the variable name and its value are printed
-print(f"{num_apples=}, {num_oranges=}") 
+print(f"{num_apples=}, {num_oranges=}")
 total_fruit = num_apples + num_oranges
 print(f"{total_fruit=}")
 ```

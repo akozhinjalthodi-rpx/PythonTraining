@@ -167,14 +167,14 @@ To make this view callable via a URL, we need to create a URL configuration (URL
     from . import views # Import views from the current app (polls)
 
     # app_name helps Django distinguish URL names between different apps
-    app_name = 'polls' 
+    app_name = 'polls'
 
     urlpatterns = [
         # When a user requests the root of this app's URL patterns (e.g., /polls/),
         # Django will call the views.index function.
         # The name='index' argument provides a way to refer to this URL pattern
         # from other parts of Django, especially templates.
-        path('', views.index, name='index'), 
+        path('', views.index, name='index'),
     ]
     ```
 
@@ -190,7 +190,7 @@ To make this view callable via a URL, we need to create a URL configuration (URL
         # When a URL starting with 'polls/' is requested,
         # Django will strip off 'polls/' and pass the remaining string
         # to the 'polls.urls' URLconf for further processing.
-        path('polls/', include('polls.urls')), 
+        path('polls/', include('polls.urls')),
         path('admin/', admin.site.urls),
     ]
     ```
@@ -239,7 +239,7 @@ def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
     # output = ', '.join([q.question_text for q in latest_question_list])
     # return HttpResponse(output)
-    
+
     # Using Django's template system
     template = loader.get_template('polls/index.html') # Loads the template
     context = { # A dictionary mapping template variable names to Python objects
@@ -303,7 +303,7 @@ Hardcoding HTML in views is not maintainable. Django's template system allows yo
             polls/
                 index.html
                 detail.html
-                results.html 
+                results.html
     ```
 
 2.  **Template Namespacing:**
@@ -366,7 +366,7 @@ Hardcoding HTML in views is not maintainable. Django's template system allows yo
 Loading a template, filling a context, and returning an `HttpResponse` is a common pattern. Django provides the `render()` shortcut in `django.shortcuts`:
 ```python
 # polls/views.py (index view using render)
-from django.shortcuts import render 
+from django.shortcuts import render
 from .models import Question
 
 def index(request):

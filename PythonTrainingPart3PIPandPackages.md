@@ -35,7 +35,7 @@ A common convention is to name the environment `venv` or `.venv`.
 # cd my_python_project
 
 # Create a virtual environment named 'venv'
-python -m venv venv 
+python -m venv venv
 ```
 This command creates a new directory (e.g., `venv`) in your project folder. This directory contains:
 *   A copy or symlink of the Python interpreter used to create the environment.
@@ -67,13 +67,13 @@ With the virtual environment active:
 *   **`pip install <package_name>`:** Any packages you install using `pip` will be installed *only* within this active virtual environment, not globally.
     ```bash
     (venv) $ pip install requests
-    (venv) $ pip install numpy==1.20.3 
+    (venv) $ pip install numpy==1.20.3
     ```
 *   **`python` command:** Running `python` will use the interpreter isolated within the virtual environment. Any scripts you run will use this interpreter and its installed packages.
     ```bash
-    (venv) $ python --version 
+    (venv) $ python --version
     # Will show the Python version of the venv
-    (venv) $ python my_script.py 
+    (venv) $ python my_script.py
     # my_script.py will use packages installed in 'venv'
     ```
 *   **`pip list`:** Will show packages installed specifically in the active environment.
@@ -239,7 +239,7 @@ Here's a step-by-step example of a typical workflow using virtual environments a
     Let's say your project needs `requests` and a specific version of `numpy`.
     ```bash
     (venv) $ pip install requests
-    (venv) $ pip install numpy==1.23.5 
+    (venv) $ pip install numpy==1.23.5
     (venv) $ pip install pandas # Another example package
     ```
 
@@ -260,7 +260,7 @@ Here's a step-by-step example of a typical workflow using virtual environments a
     pytz==2023.3.post1
     requests==2.31.0
     six==1.16.0
-    urllib3==1.26.16 
+    urllib3==1.26.16
     # Note: Actual versions and other indirect dependencies might vary.
     ```
 
@@ -392,7 +392,7 @@ from mypckg import mod1
 from mypckg import mod2 # or from mypckg.mod2 import sum_func
 
 mod1.gfg()
-result = mod2.sum_func(1, 2) 
+result = mod2.sum_func(1, 2)
 print(result)
 ```
 
@@ -408,7 +408,7 @@ from .mod1 import gfg        # Import gfg from mod1.py into mypckg's namespace
 from .mod2 import sum_func   # Import sum_func from mod2.py into mypckg's namespace
 
 # You can also define package-level variables
-VERSION = "1.0" 
+VERSION = "1.0"
 ```
 
 `mypckg/mod1.py`:
@@ -428,13 +428,13 @@ Now, you can import and use these functions more directly:
 import mypckg # This will execute __init__.py
 
 # gfg and sum_func are now part of mypckg's namespace
-mypckg.gfg() 
+mypckg.gfg()
 result = mypckg.sum_func(1, 2)
 print(f"Sum result: {result}")
 print(f"Package version: {mypckg.VERSION}")
 
 # Alternatively, you could import them directly if __init__.py sets them up:
-# from mypckg import gfg, sum_func, VERSION 
+# from mypckg import gfg, sum_func, VERSION
 # gfg()
 # result = sum_func(1,2)
 # print(VERSION)
